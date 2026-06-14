@@ -1,0 +1,52 @@
+export interface AppState {
+  currentStep: number;
+  selectedFlow: string | null;
+  selectedType: string | null;
+  contextTouched: boolean;
+}
+
+export interface PromptData {
+  role: string;
+  stack: string;
+  project: string;
+  objective: string;
+  why: string;
+  inputData: string;
+  examples: string;
+  constraints: string[];
+  outputs: string[];
+  question: string;
+}
+
+export interface QualityCheckData {
+  role: string;
+  stack: string;
+  project: string;
+  objective: string;
+  why: string;
+  inputData: string;
+  constraints: string[];
+  outputs: string[];
+  examples: string;
+}
+
+export interface FlowCatalogItem {
+  label: string;
+  short: string;
+  types: string[];
+}
+
+export interface PromptTypeItem {
+  label: string;
+  short: string;
+  role: string;
+  objective: string;
+  output: string[];
+  constraints: string[];
+  question: string;
+}
+
+export type FlowCatalog = Record<string, FlowCatalogItem>;
+export type PromptTypes = Record<string, PromptTypeItem>;
+export type ConstraintCatalog = Record<string, string>;
+export type OutputCatalog = Record<string, string>;
