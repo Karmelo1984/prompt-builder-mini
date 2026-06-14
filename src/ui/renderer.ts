@@ -1,36 +1,48 @@
 import type { PromptBuilder } from '../services/PromptBuilder';
-import { flowCatalog, promptTypes, constraintCatalog, outputCatalog, tips } from '../data/catalogs';
+import { profileCatalog, promptTemplateCatalog, constraintCatalog, outputCatalog, tips } from '../data/catalogs';
 import { appInfo } from '../config/app-info';
 
-const $ = (id: string): HTMLElement => document.getElementById(id)!;
+const $ = (id: string): HTMLElement => {
+  const element = document.getElementById(id);
+  if (!element) {
+    throw new Error(`DOM element with id="${id}" not found`);
+  }
+  return element;
+};
 
 export class Renderer {
+  private resetNoticeTimer: number | null = null;
+
   constructor(private builder: PromptBuilder) {}
 
-  renderFlows(): void {
-    const flowGrid = $('flowGrid');
-    flowGrid.innerHTML = Object.entries(flowCatalog)
+  renderProfiles(): void {
+    const profileGrid = $('profileGrid');
+    profileGrid.innerHTML = Object.entries(profileCatalog)
       .map(
         ([key, item]) => `
-    <button class="flow-card" type="button" data-flow="${key}">
+    <button class="flow-card" type="button" data-profile="${key}">
       <strong>${item.label}</strong>
-      <small>${item.short}</small>
+      <small>${item.description}</small>
     </button>
   `
       )
       .join('');
   }
 
-  renderTypes(): void {
-    const allowed = this.builder.getAllowedTypes();
-    const typeGrid = $('typeGrid');
-    typeGrid.innerHTML = allowed
+  renderTemplates(): void {
+    const templateGrid = $('templateGrid');
+    if (!this.builder.getState().selectedProfile) {
+      templateGrid.innerHTML = '<p class="muted">Selecciona primero un perfil para ver sus plantillas.</p>';
+      return;
+    }
+    const allowed = this.builder.getAllowedTemplates();
+    templateGrid.innerHTML = allowed
       .map(key => {
-        const item = promptTypes[key];
+        const item = promptTemplateCatalog[key];
         return `
-      <button class="type-card" type="button" data-type="${key}">
+      <button class="type-card" type="button" data-template="${key}">
         <strong>${item.label}</strong>
-        <small>${item.short}</small>
+        <small>${item.description}</small>
       </button>
     `;
       })
@@ -53,12 +65,12 @@ export class Renderer {
     tipsList.innerHTML = tips.map(t => `<li>${t}</li>`).join('');
   }
 
-  updateFlowBadge(): void {
-    ($('flowBadge') as HTMLElement).textContent = this.builder.getFlowLabel();
+  updateProfileBadge(): void {
+    ($('profileBadge') as HTMLElement).textContent = this.builder.getProfileLabel();
   }
 
-  updateTypeBadge(): void {
-    ($('typeBadge') as HTMLElement).textContent = this.builder.getTypeLabel();
+  updateTemplateBadge(): void {
+    ($('templateBadge') as HTMLElement).textContent = this.builder.getTemplateLabel();
   }
 
   goToStep(step: number): void {
@@ -80,8 +92,8 @@ export class Renderer {
     const getChecked = (containerId: string): string[] =>
       [...document.querySelectorAll(`#${containerId} input:checked`)].map(i => (i as HTMLInputElement).value);
 
-    if (step === 1) return Boolean(this.builder.getState().selectedFlow);
-    if (step === 2) return Boolean(this.builder.getState().selectedType);
+    if (step === 1) return Boolean(this.builder.getState().selectedProfile);
+    if (step === 2) return Boolean(this.builder.getState().selectedTemplate);
     if (step === 3) return Boolean(val('role') && val('objective'));
     if (step === 4) return getChecked('constraints').length > 0;
     if (step === 5) return getChecked('outputs').length > 0;
@@ -137,13 +149,13 @@ export class Renderer {
     document.querySelectorAll('#constraints label, #outputs label').forEach(label => {
       label.classList.remove('recommended');
     });
-    const typeData = this.builder.getPromptTypeData();
-    if (!typeData) return;
-    typeData.constraints.forEach(key => {
+    const templateData = this.builder.getPromptTemplateData();
+    if (!templateData) return;
+    (templateData.recommendedRestrictions ?? []).forEach(key => {
       const elem = document.querySelector(`#constraints label[data-key="${key}"]`);
       if (elem) elem.classList.add('recommended');
     });
-    typeData.output.forEach(key => {
+    (templateData.recommendedOutputs ?? []).forEach(key => {
       const elem = document.querySelector(`#outputs label[data-key="${key}"]`);
       if (elem) elem.classList.add('recommended');
     });
@@ -180,8 +192,11 @@ export class Renderer {
       4: 'Salida requerida limpiada.'
     };
     notice.textContent = messages[step] || '';
-    window.clearTimeout((notice as any).timer);
-    (notice as any).timer = window.setTimeout(() => (notice.textContent = ''), 1600);
+    if (this.resetNoticeTimer !== null) window.clearTimeout(this.resetNoticeTimer);
+    this.resetNoticeTimer = window.setTimeout(() => {
+      notice.textContent = '';
+      this.resetNoticeTimer = null;
+    }, 1600);
   }
 
   setCheckboxLabel(label: HTMLElement, checked: boolean): void {

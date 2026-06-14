@@ -23,11 +23,11 @@
       <aside class="stepper" aria-label="Navegación de pasos">
         <button class="step-pill active" type="button" data-step="1">
           <span>1</span>
-          <strong>Flujo de decisión</strong>
+          <strong>Perfil de uso</strong>
         </button>
         <button class="step-pill" type="button" data-step="2">
           <span>2</span>
-          <strong>Situación</strong>
+          <strong>Plantilla</strong>
         </button>
         <button class="step-pill" type="button" data-step="3">
           <span>3</span>
@@ -48,21 +48,20 @@
           <div class="section-title">
             <div>
               <p class="eyebrow">Paso 1</p>
-              <h2>Flujo de decisión</h2>
+              <h2>¿Cuál es tu rol o perfil?</h2>
             </div>
-            <span id="flowBadge" class="badge">Sin seleccionar</span>
+            <span id="profileBadge" class="badge">Sin seleccionar</span>
           </div>
 
-          <p class="muted max-text">Primero decide qué tipo de trabajo quieres delegar a la IA. Cambiar este paso borra la situación, el contexto, las restricciones y la salida marcadas después.</p>
-
-          <div class="flow-map" aria-label="Diagrama de flujo para elegir tipo de prompt">
-            <div class="flow-root">Necesito ayuda de IA para programar</div>
-            <div class="flow-grid" id="flowGrid"></div>
-          </div>
+          <p class="muted max-text">Elige un perfil o rol. Este paso inicial reinicia la plantilla, contexto, restricciones y salida que ya tengas marcadas.</p>
 
           <div class="tip-box">
             <h3>Regla de ahorro</h3>
-            <p>El objetivo no es escribir el prompt más corto, sino evitar tres rondas de correcciones. Un prompt estructurado suele gastar menos tokens totales.</p>
+            <p>El objetivo no es escribir el prompt más corto, sino evitar varias rondas de correcciones. En conjunto, un prompt estructurado suele gastar menos tokens totales.</p>
+          </div>
+
+          <div class="flow-map" aria-label="Seleccionar perfil de usuario">
+            <div class="flow-grid" id="profileGrid"></div>
           </div>
         </section>
 
@@ -70,14 +69,14 @@
           <div class="section-title">
             <div>
               <p class="eyebrow">Paso 2</p>
-              <h2>Selecciona situación</h2>
+              <h2>Plantilla</h2>
             </div>
-            <span id="typeBadge" class="badge">Sin seleccionar</span>
+            <span id="templateBadge" class="badge">Sin seleccionar</span>
           </div>
 
-          <p class="muted max-text">Elige la situación exacta. Cambiarla borra el contexto escrito y las selecciones posteriores para evitar arrastrar basura vieja con etiqueta XML.</p>
+          <p class="muted max-text">Elige la plantilla exacta para tu caso de uso. Cambiarla borra el contexto escrito y las selecciones posteriores.</p>
 
-          <div id="typeGrid" class="type-grid" aria-label="Tipos de prompt"></div>
+          <div id="templateGrid" class="type-grid" aria-label="Plantillas disponibles"></div>
         </section>
 
         <section class="step-screen" data-screen="3">

@@ -3,16 +3,52 @@ import type { Renderer } from '../ui/renderer';
 
 const $ = (id: string): HTMLElement => document.getElementById(id)!;
 
+type ResetScope = 'profile' | 'template' | 'context' | 'restrictions';
+
+function resetCascade(
+  scope: ResetScope,
+  builder: PromptBuilder,
+  renderer: Renderer,
+  fields: string[]
+): void {
+  if (scope === 'profile') {
+    renderer.clearFlagValues(fields);
+    renderer.clearChecks('constraints');
+    renderer.clearChecks('outputs');
+    renderer.updateTemplateBadge();
+    renderer.showResetNotice(1);
+  } else if (scope === 'template') {
+    builder.resetContext();
+    renderer.clearFlagValues(fields);
+    renderer.clearChecks('constraints');
+    renderer.clearChecks('outputs');
+    renderer.showResetNotice(2);
+  } else if (scope === 'context') {
+    renderer.clearChecks('constraints');
+    renderer.clearChecks('outputs');
+    renderer.showResetNotice(3);
+  } else {
+    renderer.clearChecks('outputs');
+    renderer.showResetNotice(4);
+  }
+}
+
 export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: string[], updatePrompt: () => void): void {
-  // Flujo y tipo
+  // Perfil y plantilla
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement;
-    const flowButton = target.closest('[data-flow]') as HTMLElement | null;
-    if (flowButton) {
-      const flow = flowButton.dataset.flow!;
-      builder.selectFlow(flow);
-      renderer.renderTypes();
-      renderer.updateFlowBadge();
+    const profileButton = target.closest('[data-profile]') as HTMLElement | null;
+    if (profileButton) {
+      const profileId = profileButton.dataset.profile!;
+      const profileChanged = builder.getState().selectedProfile !== profileId;
+      builder.selectProfile(profileId);
+      document.querySelectorAll('[data-profile]').forEach(el => el.classList.remove('active'));
+      profileButton.classList.add('active');
+      if (profileChanged) {
+        resetCascade('profile', builder, renderer, fields);
+      }
+      renderer.renderTemplates();
+      renderer.updateProfileBadge();
       renderer.markRecommended();
       builder.setCurrentStep(2);
       renderer.goToStep(2);
@@ -20,20 +56,20 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
       return;
     }
 
-    const typeButton = target.closest('[data-type]') as HTMLElement | null;
-    if (typeButton) {
-      const type = typeButton.dataset.type!;
-      builder.selectType(type);
-      const typeData = builder.getPromptTypeData();
-      if (typeData) {
-        renderer.setFlagValue('role', typeData.role);
-        renderer.setFlagValue('objective', typeData.objective);
+    const templateButton = target.closest('[data-template]') as HTMLElement | null;
+    if (templateButton) {
+      const templateId = templateButton.dataset.template!;
+      builder.selectTemplate(templateId);
+      const templateData = builder.getPromptTemplateData();
+      document.querySelectorAll('[data-template]').forEach(el => el.classList.remove('active'));
+      templateButton.classList.add('active');
+      resetCascade('template', builder, renderer, fields);
+      if (templateData) {
+        renderer.setFlagValue('role', templateData.role);
+        renderer.setFlagValue('objective', templateData.objective);
       }
-      renderer.clearChecks('constraints');
-      renderer.clearChecks('outputs');
-      renderer.updateTypeBadge();
+      renderer.updateTemplateBadge();
       renderer.markRecommended();
-      renderer.showResetNotice(2);
       builder.setCurrentStep(3);
       renderer.goToStep(3);
       updatePrompt();
@@ -49,9 +85,7 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
       updatePrompt();
     });
     field.addEventListener('change', () => {
-      renderer.clearChecks('constraints');
-      renderer.clearChecks('outputs');
-      renderer.showResetNotice(3);
+      resetCascade('context', builder, renderer, fields);
       updatePrompt();
     });
   });
@@ -67,8 +101,7 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
   constraintsElement.addEventListener('change', (event) => {
     const label = (event.target as HTMLElement).closest('label');
     if (label) renderer.setCheckboxLabel(label, (event.target as HTMLInputElement).checked);
-    renderer.clearChecks('outputs');
-    renderer.showResetNotice(4);
+    resetCascade('restrictions', builder, renderer, fields);
     updatePrompt();
   });
 
@@ -82,27 +115,45 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
 
   // Botones de recomendación
   ($('applyRecommendedConstraints') as HTMLElement).addEventListener('click', () => {
-    const typeData = builder.getPromptTypeData();
-    if (!typeData) return;
+    const templateData = builder.getPromptTemplateData();
+    if (!templateData) return;
     renderer.clearChecks('constraints');
-    renderer.setChecked('constraints', typeData.constraints);
-    renderer.clearChecks('outputs');
-    renderer.showResetNotice(4);
+    renderer.setChecked('constraints', templateData.recommendedRestrictions ?? []);
+    resetCascade('restrictions', builder, renderer, fields);
     updatePrompt();
   });
 
   ($('applyRecommendedOutputs') as HTMLElement).addEventListener('click', () => {
-    const typeData = builder.getPromptTypeData();
-    if (!typeData) return;
+    const templateData = builder.getPromptTemplateData();
+    if (!templateData) return;
     renderer.clearChecks('outputs');
-    renderer.setChecked('outputs', typeData.output);
+    renderer.setChecked('outputs', templateData.recommendedOutputs ?? []);
     updatePrompt();
   });
 
   // Navegación de pasos
   ($('prevStep') as HTMLElement).addEventListener('click', () => {
+    const fromStep = builder.getState().currentStep;
+    if (fromStep === 2) {
+      builder.reset();
+      document.querySelectorAll('[data-profile]').forEach(el => el.classList.remove('active'));
+      renderer.clearFlagValues(fields);
+      renderer.clearChecks('constraints');
+      renderer.clearChecks('outputs');
+      renderer.updateProfileBadge();
+      renderer.updateTemplateBadge();
+      renderer.renderTemplates();
+      renderer.markRecommended();
+    } else if (fromStep === 3) {
+      resetCascade('template', builder, renderer, fields);
+    } else if (fromStep === 4) {
+      resetCascade('context', builder, renderer, fields);
+    } else if (fromStep === 5) {
+      resetCascade('restrictions', builder, renderer, fields);
+    }
     builder.prevStep();
     renderer.goToStep(builder.getState().currentStep);
+    updatePrompt();
   });
 
   ($('nextStep') as HTMLElement).addEventListener('click', () => {
@@ -127,8 +178,8 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const filename = builder.getState().selectedType
-      ? `prompt-${builder.getState().selectedType}.txt`
+    const filename = builder.getState().selectedTemplate
+      ? `prompt-${builder.getState().selectedTemplate}.txt`
       : 'prompt-generado.txt';
     a.href = url;
     a.download = filename;
@@ -139,20 +190,17 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
   });
 
   ($('resetAll') as HTMLElement).addEventListener('click', () => {
-    // Reset builder state
     builder.reset();
-
-    // Reset UI
     renderer.clearFlagValues(fields);
     ($('compactMode') as HTMLInputElement).checked = false;
     renderer.clearChecks('constraints');
     renderer.clearChecks('outputs');
-    renderer.updateFlowBadge();
-    renderer.updateTypeBadge();
-    document.querySelectorAll('[data-flow], [data-type]').forEach(el => {
+    renderer.updateProfileBadge();
+    renderer.updateTemplateBadge();
+    document.querySelectorAll('[data-profile], [data-template]').forEach(el => {
       el.classList.remove('active');
     });
-    renderer.renderTypes();
+    renderer.renderTemplates();
     renderer.markRecommended();
     renderer.goToStep(1);
     updatePrompt();

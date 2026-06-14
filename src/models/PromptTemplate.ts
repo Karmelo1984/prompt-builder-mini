@@ -3,6 +3,7 @@ export class PromptTemplate {
     readonly key: string,
     readonly label: string,
     readonly description: string,
+    readonly profileId: string,
     readonly role: string,
     readonly objective: string,
     readonly recommendedRestrictions: string[],
@@ -15,6 +16,7 @@ export class PromptTemplate {
     data: {
       label: string;
       description: string;
+      profileId: string;
       role: string;
       objective: string;
       recommendedRestrictions?: string[];
@@ -26,6 +28,7 @@ export class PromptTemplate {
       key,
       data.label,
       data.description,
+      data.profileId,
       data.role,
       data.objective,
       data.recommendedRestrictions ?? [],

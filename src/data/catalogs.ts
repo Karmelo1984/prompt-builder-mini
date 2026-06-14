@@ -113,7 +113,7 @@ export const promptTypes: PromptTypes = {
   architecture: {
     label: 'Arquitectura / decisión',
     short: 'Comparar opciones y elegir trade-off.',
-    role: 'arquitecto de software pragmático orientado a decisiones reversibles',
+    role: 'arquitecto de software orientado a decisiones reversibles',
     objective: 'comparar alternativas técnicas y recomendar una decisión justificada',
     output: ['options', 'tradeoffs', 'decision', 'risks', 'nextSteps'],
     constraints: ['noHype', 'stateAssumptions', 'preferSimple'],
@@ -233,6 +233,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'user-story': {
     label: 'Historia de usuario',
     description: 'Redactar historias claras con criterios y aceptación.',
+    profileId: 'product-owner',
     role: 'product manager experto en historias de usuario bien estructuradas',
     objective: 'redactar una historia clara con criterios de aceptación verificables',
     recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
@@ -242,6 +243,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'acceptance-criteria': {
     label: 'Criterios de aceptación',
     description: 'Definir criterios Gherkin o escenarios de aceptación.',
+    profileId: 'product-owner',
     role: 'product owner especializado en criterios de aceptación verificables',
     objective: 'definir criterios Gherkin concisos y verificables',
     recommendedRestrictions: ['edgeCases', 'separateFacts'],
@@ -251,6 +253,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'refinement': {
     label: 'Refinamiento',
     description: 'Preparar una épica o feature para sprint.',
+    profileId: 'product-owner',
     role: 'product owner experto en refinamiento de requisitos',
     objective: 'desglosar una épica en historias estimables y independientes',
     recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
@@ -260,6 +263,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'prioritization': {
     label: 'Priorización',
     description: 'Evaluar y priorizar requisitos por valor e impacto.',
+    profileId: 'product-owner',
     role: 'product manager estratégico especializado en priorización de valor',
     objective: 'evaluar alternativas y recomendar orden de implementación por impacto',
     recommendedRestrictions: ['stateAssumptions', 'separateFacts'],
@@ -269,6 +273,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'impact-analysis': {
     label: 'Análisis de impacto',
     description: 'Evaluar riesgos, beneficios y dependencias de un cambio.',
+    profileId: 'product-owner',
     role: 'product strategist especializado en análisis de impacto',
     objective: 'evaluar impacto de negocio, riesgos y dependencias',
     recommendedRestrictions: ['stateAssumptions', 'separateFacts'],
@@ -280,6 +285,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'test-cases': {
     label: 'Casos de prueba',
     description: 'Crear casos de prueba paso a paso para validación manual.',
+    profileId: 'qa-manual',
     role: 'QA manual especializado en casos de prueba detallados y reproducibles',
     objective: 'redactar casos de prueba paso a paso con resultados esperados',
     recommendedRestrictions: ['edgeCases', 'separateFacts'],
@@ -289,6 +295,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'gherkin-scenarios': {
     label: 'Escenarios Gherkin',
     description: 'Escribir escenarios Gherkin (Given/When/Then) para validación.',
+    profileId: 'qa-manual',
     role: 'QA especializado en BDD y escenarios Gherkin claros',
     objective: 'redactar escenarios Gherkin Given/When/Then para cada caso',
     recommendedRestrictions: ['preferSimple', 'edgeCases'],
@@ -298,6 +305,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'bug-report': {
     label: 'Bug report',
     description: 'Redactar reportes de bug con contexto, pasos y evidencia.',
+    profileId: 'qa-manual',
     role: 'QA especializado en reportes detallados y reproducibles',
     objective: 'redactar un reporte de bug claro con pasos reproducibles y evidencia',
     recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
@@ -307,6 +315,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'regression-checklist': {
     label: 'Checklist de regresión',
     description: 'Crear checklist para validar regresiones después de cambios.',
+    profileId: 'qa-manual',
     role: 'QA experto en cobertura de regresión y casos críticos',
     objective: 'listar casos críticos para validar que no haya regresiones',
     recommendedRestrictions: ['edgeCases', 'separateFacts'],
@@ -316,6 +325,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'exploratory-testing': {
     label: 'Pruebas exploratorias',
     description: 'Plan y charter para testing exploratorio sistemático.',
+    profileId: 'qa-manual',
     role: 'QA explorador especializado en testing fuera de guión',
     objective: 'diseñar charter y estrategia para testing exploratorio efectivo',
     recommendedRestrictions: ['edgeCases', 'separateFacts'],
@@ -327,6 +337,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'automated-tests': {
     label: 'Tests automatizados',
     description: 'Escribir tests unitarios, integración o e2e.',
+    profileId: 'qa-automation',
     role: 'QA automation engineer especializado en tests deterministas',
     objective: 'escribir suite de tests automatizados confiables y mantenibles',
     recommendedRestrictions: ['noFragileTests', 'blackBox', 'edgeCases'],
@@ -336,6 +347,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'mocks-stubs': {
     label: 'Mocks/stubs',
     description: 'Diseñar mocks, stubs y test doubles necesarios.',
+    profileId: 'qa-automation',
     role: 'QA automation especializado en test doubles y aislamientos',
     objective: 'diseñar mocks/stubs para aislar componentes bajo test',
     recommendedRestrictions: ['preferSimple', 'blackBox'],
@@ -345,6 +357,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'flaky-tests-review': {
     label: 'Revisión de flaky tests',
     description: 'Analizar y corregir tests inestables o flakys.',
+    profileId: 'qa-automation',
     role: 'QA automation especializado en diagnóstico de test flakys',
     objective: 'identificar causa de flakiness y proponer fix',
     recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
@@ -354,6 +367,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'coverage-strategy': {
     label: 'Estrategia de cobertura',
     description: 'Definir estrategia de cobertura (unit, integration, e2e).',
+    profileId: 'qa-automation',
     role: 'QA lead especializado en estrategia de testing integral',
     objective: 'definir estrategia de cobertura por nivel de test',
     recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
@@ -365,6 +379,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'debug': {
     label: 'Debug / traceback',
     description: 'Encontrar causa raíz y aplicar el cambio mínimo.',
+    profileId: 'developer',
     role: 'senior developer con foco en diagnóstico rápido y cambios mínimos',
     objective: 'localizar la causa raíz y proponer un fix mínimo verificable',
     recommendedRestrictions: ['noRefactor', 'noDeps', 'noApi'],
@@ -374,6 +389,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'feature': {
     label: 'Feature',
     description: 'Implementar funcionalidad nueva con criterios de aceptación.',
+    profileId: 'developer',
     role: 'senior developer orientado a producción y mantenibilidad',
     objective: 'implementar funcionalidad con cambio mínimo mantenible',
     recommendedRestrictions: ['backwardCompatibility', 'noDeps', 'smallSteps'],
@@ -383,6 +399,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'refactor-safe': {
     label: 'Refactor seguro',
     description: 'Mejorar estructura sin cambiar comportamiento observable.',
+    profileId: 'developer',
     role: 'senior developer especializado en refactors seguros',
     objective: 'mejorar estructura interna manteniendo comportamiento idéntico',
     recommendedRestrictions: ['noApi', 'noDeps', 'sameBehavior', 'smallSteps'],
@@ -392,6 +409,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'code-review': {
     label: 'Code review',
     description: 'Revisar código detectando bugs, riesgos y mejoras reales.',
+    profileId: 'developer',
     role: 'reviewer senior especializado en bugs, seguridad y rendimiento',
     objective: 'revisar priorizando problemas reales sobre estilo menor',
     recommendedRestrictions: ['noStyleNitpicks', 'markOpinions', 'noBigRewrite'],
@@ -401,6 +419,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'tests-dev': {
     label: 'Tests',
     description: 'Crear tests unitarios, integración o e2e con buen coverage.',
+    profileId: 'developer',
     role: 'QA automation engineer experto en tests deterministas',
     objective: 'diseñar tests que cubran casos críticos y bordes',
     recommendedRestrictions: ['noFragileTests', 'blackBox', 'edgeCases'],
@@ -410,6 +429,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'sql-performance': {
     label: 'SQL / rendimiento',
     description: 'Optimizar query, índices o diagnóstico de datos.',
+    profileId: 'developer',
     role: 'DBA senior especializado en PostgreSQL y optimización',
     objective: 'mejorar query sin cambiar resultado lógico',
     recommendedRestrictions: ['sameResult', 'noSchemaChangeUnlessNeeded', 'explainAssumptions'],
@@ -419,6 +439,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'migration-dev': {
     label: 'Migración',
     description: 'Migrar entre tecnologías o versiones con bajo riesgo.',
+    profileId: 'developer',
     role: 'senior developer especializado en migraciones incrementales',
     objective: 'migrar código minimizando riesgo y manteniendo comportamiento',
     recommendedRestrictions: ['smallSteps', 'sameBehavior', 'noDeps', 'backwardCompatibility'],
@@ -430,7 +451,8 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'adr': {
     label: 'ADR (Architecture Decision Record)',
     description: 'Documentar decisión arquitectónica con contexto y rationale.',
-    role: 'arquitecto pragmático especializado en ADRs claros',
+    profileId: 'tech-lead',
+    role: 'arquitecto de software especializado en ADRs claros',
     objective: 'redactar ADR con contexto, decisión y consecuencias',
     recommendedRestrictions: ['stateAssumptions', 'preferSimple'],
     recommendedOutputs: ['summary', 'options', 'decision', 'risks'],
@@ -439,7 +461,8 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'technical-tradeoffs': {
     label: 'Trade-offs técnicos',
     description: 'Comparar opciones técnicas evaluando trade-offs.',
-    role: 'arquitecto de software pragmático orientado a decisiones reversibles',
+    profileId: 'tech-lead',
+    role: 'arquitecto de software orientado a decisiones reversibles',
     objective: 'comparar alternativas técnicas con trade-offs claros',
     recommendedRestrictions: ['noHype', 'stateAssumptions', 'preferSimple'],
     recommendedOutputs: ['options', 'tradeoffs', 'decision', 'risks'],
@@ -448,6 +471,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'architecture-design': {
     label: 'Diseño arquitectónico',
     description: 'Diseñar arquitectura o componentes con diagramas.',
+    profileId: 'tech-lead',
     role: 'arquitecto especializado en diseño modular y escalable',
     objective: 'diseñar arquitectura clara con componentes y flujos',
     recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
@@ -457,6 +481,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'technical-debt': {
     label: 'Deuda técnica',
     description: 'Evaluar, priorizar y estrategia de deuda técnica.',
+    profileId: 'tech-lead',
     role: 'tech lead especializado en evaluación de deuda técnica',
     objective: 'evaluar deuda técnica y proponer estrategia de amortización',
     recommendedRestrictions: ['preferSimple', 'stateAssumptions', 'separateFacts'],
@@ -468,6 +493,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'ux-heuristic': {
     label: 'Análisis heurístico UX',
     description: 'Evaluar usabilidad contra heurísticas de Nielsen.',
+    profileId: 'product-designer',
     role: 'UX specialist experto en heurísticas de usabilidad',
     objective: 'evaluar interfaz contra heurísticas y proponer mejoras',
     recommendedRestrictions: ['separateFacts', 'markOpinions'],
@@ -477,6 +503,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'user-flow': {
     label: 'User flow',
     description: 'Diseñar o evaluar flujos de usuario paso a paso.',
+    profileId: 'product-designer',
     role: 'product designer especializado en user flows claros',
     objective: 'diseñar user flow optimizado para el caso de uso',
     recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
@@ -486,6 +513,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'microcopy': {
     label: 'Microcopy',
     description: 'Redactar textos pequeños claros y consistentes en UI.',
+    profileId: 'product-designer',
     role: 'content strategist especializado en microcopy clara',
     objective: 'redactar textos pequeños consistentes y precisos',
     recommendedRestrictions: ['preferSimple', 'separateFacts'],
@@ -495,6 +523,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'ui-states': {
     label: 'Estados UI',
     description: 'Documentar estados UI (idle, loading, error, success, etc).',
+    profileId: 'product-designer',
     role: 'product designer especializado en documentación de estados',
     objective: 'documentar todos los estados posibles de un componente',
     recommendedRestrictions: ['edgeCases', 'preferSimple'],
@@ -506,6 +535,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'metric-definition': {
     label: 'Definición de métrica',
     description: 'Definir métrica clara con cálculo exacto.',
+    profileId: 'data-analyst',
     role: 'data analyst especializado en definiciones de métricas',
     objective: 'definir métrica con cálculo exacto, numerador/denominador',
     recommendedRestrictions: ['stateAssumptions', 'separateFacts'],
@@ -515,6 +545,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'sql-analysis': {
     label: 'SQL análisis',
     description: 'Escribir query SQL para extraer datos y analizar.',
+    profileId: 'data-analyst',
     role: 'data analyst especializado en SQL y análisis exploratorio',
     objective: 'escribir query SQL para validar hipótesis o explorar datos',
     recommendedRestrictions: ['sameResult', 'explainAssumptions'],
@@ -524,6 +555,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'dashboard-spec': {
     label: 'Dashboard spec',
     description: 'Especificar dashboard con métricas, filtros y diseño.',
+    profileId: 'data-analyst',
     role: 'analytics engineer especializado en specs de dashboards',
     objective: 'especificar dashboard con métricas, visualizaciones y filtros',
     recommendedRestrictions: ['stateAssumptions', 'preferSimple'],
@@ -533,6 +565,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'results-interpretation': {
     label: 'Interpretación de resultados',
     description: 'Interpretar datos, validar supuestos y conclusiones.',
+    profileId: 'data-analyst',
     role: 'data scientist especializado en interpretación crítica',
     objective: 'interpretar resultados validando supuestos y conclusiones',
     recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
@@ -544,6 +577,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'incident-diagnosis': {
     label: 'Diagnóstico de incidente',
     description: 'Diagnosticar raíz de incidente y proponer mitigación.',
+    profileId: 'devops-sre',
     role: 'SRE especializado en diagnóstico rápido de incidentes',
     objective: 'diagnosticar causa raíz e impacto del incidente',
     recommendedRestrictions: ['separateFacts', 'stateAssumptions', 'priorizarBloqueante'],
@@ -553,6 +587,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'runbook': {
     label: 'Runbook',
     description: 'Escribir runbook para mitigación manual de incidente.',
+    profileId: 'devops-sre',
     role: 'SRE especializado en runbooks claros y probados',
     objective: 'escribir runbook paso a paso para responder incidentes',
     recommendedRestrictions: ['preferSimple', 'edgeCases'],
@@ -562,6 +597,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'postmortem': {
     label: 'Postmortem',
     description: 'Redactar postmortem de incidente sin culpa.',
+    profileId: 'devops-sre',
     role: 'SRE especializado en postmortems constructivos',
     objective: 'redactar postmortem analizando causa raíz y mejoras',
     recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
@@ -571,6 +607,7 @@ export const promptTemplateCatalog: PromptTemplateCatalog = {
   'deploy-checklist': {
     label: 'Checklist de despliegue',
     description: 'Crear checklist de pre/durante/post despliegue.',
+    profileId: 'devops-sre',
     role: 'DevOps especializado en checklists de despliegue seguros',
     objective: 'crear checklist de pasos pre/durante/post despliegue',
     recommendedRestrictions: ['preferSimple', 'edgeCases'],

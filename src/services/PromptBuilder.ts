@@ -1,7 +1,5 @@
 import type { AppState, PromptData } from '../types/index';
-import { flowCatalog, promptTypes, constraintCatalog, outputCatalog } from '../data/catalogs';
-import { Mappers } from '../models/mappers';
-import type { Flow, PromptType } from '../models/index';
+import { profileCatalog, promptTemplateCatalog, constraintCatalog, outputCatalog } from '../data/catalogs';
 
 export class PromptBuilder {
   private state: AppState;
@@ -9,8 +7,8 @@ export class PromptBuilder {
   constructor() {
     this.state = {
       currentStep: 1,
-      selectedFlow: null,
-      selectedType: null,
+      selectedProfile: null,
+      selectedTemplate: null,
       contextTouched: false
     };
   }
@@ -19,17 +17,16 @@ export class PromptBuilder {
     return { ...this.state };
   }
 
-  selectFlow(flow: string): void {
-    if (this.state.selectedFlow !== flow) {
-      this.state.selectedFlow = flow;
+  selectProfile(profileId: string): void {
+    if (this.state.selectedProfile !== profileId) {
+      this.state.selectedProfile = profileId;
       this.resetAfter(1);
     }
   }
 
-  selectType(type: string): void {
-    if (this.state.selectedType !== type) {
-      this.state.selectedType = type;
-      this.resetAfter(2);
+  selectTemplate(templateId: string): void {
+    if (this.state.selectedTemplate !== templateId) {
+      this.state.selectedTemplate = templateId;
     }
   }
 
@@ -51,7 +48,7 @@ export class PromptBuilder {
 
   resetAfter(step: number): void {
     if (step < 2) {
-      this.state.selectedType = null;
+      this.state.selectedTemplate = null;
       this.state.contextTouched = false;
     }
   }
@@ -63,8 +60,8 @@ export class PromptBuilder {
   reset(): void {
     this.state = {
       currentStep: 1,
-      selectedFlow: null,
-      selectedType: null,
+      selectedProfile: null,
+      selectedTemplate: null,
       contextTouched: false
     };
   }
@@ -80,8 +77,8 @@ export class PromptBuilder {
   }): Array<[string, boolean]> {
     const state = this.getState();
     return [
-      ['Flujo decidido', Boolean(state.selectedFlow)],
-      ['Situación seleccionada', Boolean(state.selectedType)],
+      ['Perfil seleccionado', Boolean(state.selectedProfile)],
+      ['Plantilla seleccionada', Boolean(state.selectedTemplate)],
       ['Rol técnico', Boolean(data.role && !data.role.includes('['))],
       ['Stack indicado', Boolean(data.stack)],
       ['Objetivo concreto', Boolean(data.objective && !data.objective.includes('['))],
@@ -92,24 +89,27 @@ export class PromptBuilder {
     ];
   }
 
-  getFlowLabel(): string {
-    if (!this.state.selectedFlow) return 'Sin seleccionar';
-    return flowCatalog[this.state.selectedFlow as keyof typeof flowCatalog].label;
+  getProfileLabel(): string {
+    if (!this.state.selectedProfile) return 'Sin seleccionar';
+    return profileCatalog[this.state.selectedProfile as keyof typeof profileCatalog].label;
   }
 
-  getTypeLabel(): string {
-    if (!this.state.selectedType) return 'Sin seleccionar';
-    return promptTypes[this.state.selectedType].label;
+  getTemplateLabel(): string {
+    if (!this.state.selectedTemplate) return 'Sin seleccionar';
+    return promptTemplateCatalog[this.state.selectedTemplate].label;
   }
 
-  getAllowedTypes(): string[] {
-    if (!this.state.selectedFlow) return Object.keys(promptTypes);
-    return flowCatalog[this.state.selectedFlow as keyof typeof flowCatalog].types;
+  getAllowedTemplates(profileId?: string): string[] {
+    const pid = profileId || this.state.selectedProfile;
+    if (!pid) return Object.keys(promptTemplateCatalog);
+    return Object.entries(promptTemplateCatalog)
+      .filter(([, data]) => data.profileId === pid)
+      .map(([key]) => key);
   }
 
-  getPromptTypeData() {
-    if (!this.state.selectedType) return null;
-    return promptTypes[this.state.selectedType];
+  getPromptTemplateData() {
+    if (!this.state.selectedTemplate) return null;
+    return promptTemplateCatalog[this.state.selectedTemplate];
   }
 
   buildPrompt(data: PromptData, compact: boolean): string {
@@ -175,25 +175,4 @@ export class PromptBuilder {
   getOutputLabel(key: string): string {
     return outputCatalog[key] || '';
   }
-
-  getSelectedFlow(): Flow | null {
-    if (!this.state.selectedFlow) return null;
-    return Mappers.toFlow(this.state.selectedFlow);
-  }
-
-  getSelectedType(): PromptType | null {
-    if (!this.state.selectedType) return null;
-    return Mappers.toPromptType(this.state.selectedType);
-  }
-
-  getFlowList(): Flow[] {
-    return Mappers.toFlowList();
-  }
-
-  getPromptTypeList(): PromptType[] {
-    return Mappers.toPromptTypeList(this.state.selectedFlow || undefined);
-  }
-
-  // Mappers métodos reservados para patrón profiles/templates futuro.
-  // Ejemplo: Profile.flows = getFlowList(), Template.types = getPromptTypeList()
 }

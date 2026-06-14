@@ -1,5 +1,5 @@
-import { Flow, PromptType, Prompt, Profile, PromptTemplate } from './index';
-import { flowCatalog, promptTypes, constraintCatalog, outputCatalog, profileCatalog, promptTemplateCatalog } from '../data/catalogs';
+import { Flow, PromptType, Prompt } from './index';
+import { flowCatalog, promptTypes, constraintCatalog, outputCatalog } from '../data/catalogs';
 
 export class Mappers {
   static toFlow(key: string): Flow | null {
@@ -52,23 +52,5 @@ export class Mappers {
       const data = promptTypes[key];
       return PromptType.from(key, data);
     });
-  }
-
-  static toProfile(key: string): Profile | null {
-    const data = profileCatalog[key as keyof typeof profileCatalog];
-    return data ? Profile.from(key, data) : null;
-  }
-
-  static toPromptTemplate(key: string): PromptTemplate | null {
-    const data = promptTemplateCatalog[key as keyof typeof promptTemplateCatalog];
-    return data ? PromptTemplate.from(key, data) : null;
-  }
-
-  static toProfileList(): Profile[] {
-    return Object.entries(profileCatalog).map(([key, data]) => Profile.from(key, data));
-  }
-
-  static toPromptTemplateList(): PromptTemplate[] {
-    return Object.entries(promptTemplateCatalog).map(([key, data]) => PromptTemplate.from(key, data));
   }
 }

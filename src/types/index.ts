@@ -1,7 +1,7 @@
 export interface AppState {
   currentStep: number;
-  selectedFlow: string | null;
-  selectedType: string | null;
+  selectedProfile: string | null;
+  selectedTemplate: string | null;
   contextTouched: boolean;
 }
 
@@ -62,6 +62,7 @@ export interface ProfileItem {
 export interface PromptTemplateItem {
   label: string;
   description: string;
+  profileId: string;
   role: string;
   objective: string;
   recommendedRestrictions?: string[];
