@@ -52,7 +52,12 @@ export class PromptBuilder {
   resetAfter(step: number): void {
     if (step < 2) {
       this.state.selectedType = null;
+      this.state.contextTouched = false;
     }
+  }
+
+  resetContext(): void {
+    this.state.contextTouched = false;
   }
 
   reset(): void {
@@ -62,6 +67,29 @@ export class PromptBuilder {
       selectedType: null,
       contextTouched: false
     };
+  }
+
+  getQualityChecks(data: {
+    role: string;
+    stack: string;
+    objective: string;
+    why: string;
+    inputData: string;
+    constraints: string[];
+    outputs: string[];
+  }): Array<[string, boolean]> {
+    const state = this.getState();
+    return [
+      ['Flujo decidido', Boolean(state.selectedFlow)],
+      ['Situación seleccionada', Boolean(state.selectedType)],
+      ['Rol técnico', Boolean(data.role && !data.role.includes('['))],
+      ['Stack indicado', Boolean(data.stack)],
+      ['Objetivo concreto', Boolean(data.objective && !data.objective.includes('['))],
+      ['Porqué/contexto de negocio', Boolean(data.why)],
+      ['Input mínimo pegado', Boolean(data.inputData)],
+      ['Restricciones explícitas', data.constraints.length > 0],
+      ['Formato de salida', data.outputs.length > 0]
+    ];
   }
 
   getFlowLabel(): string {
@@ -82,12 +110,6 @@ export class PromptBuilder {
   getPromptTypeData() {
     if (!this.state.selectedType) return null;
     return promptTypes[this.state.selectedType];
-  }
-
-  isStepComplete(step: number): boolean {
-    // Nota: isStepComplete requiere acceso a valores de input del DOM
-    // Se validará desde el renderizador/handlers
-    return false;
   }
 
   buildPrompt(data: PromptData, compact: boolean): string {
@@ -171,4 +193,7 @@ export class PromptBuilder {
   getPromptTypeList(): PromptType[] {
     return Mappers.toPromptTypeList(this.state.selectedFlow || undefined);
   }
+
+  // Mappers métodos reservados para patrón profiles/templates futuro.
+  // Ejemplo: Profile.flows = getFlowList(), Template.types = getPromptTypeList()
 }

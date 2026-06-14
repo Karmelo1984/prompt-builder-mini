@@ -111,18 +111,15 @@ export class Renderer {
     outputs: string[];
     examples: string;
   }): void {
-    const state = this.builder.getState();
-    const checks: Array<[string, boolean]> = [
-      ['Flujo decidido', Boolean(state.selectedFlow)],
-      ['Situación seleccionada', Boolean(state.selectedType)],
-      ['Rol técnico', Boolean(data.role && !data.role.includes('['))],
-      ['Stack indicado', Boolean(data.stack)],
-      ['Objetivo concreto', Boolean(data.objective && !data.objective.includes('['))],
-      ['Porqué/contexto de negocio', Boolean(data.why)],
-      ['Input mínimo pegado', Boolean(data.inputData)],
-      ['Restricciones explícitas', data.constraints.length > 0],
-      ['Formato de salida', data.outputs.length > 0]
-    ];
+    const checks = this.builder.getQualityChecks({
+      role: data.role,
+      stack: data.stack,
+      objective: data.objective,
+      why: data.why,
+      inputData: data.inputData,
+      constraints: data.constraints,
+      outputs: data.outputs
+    });
 
     ($('qualityChecks') as HTMLElement).innerHTML = checks
       .map(

@@ -29,8 +29,11 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
         renderer.setFlagValue('role', typeData.role);
         renderer.setFlagValue('objective', typeData.objective);
       }
+      renderer.clearChecks('constraints');
+      renderer.clearChecks('outputs');
       renderer.updateTypeBadge();
       renderer.markRecommended();
+      renderer.showResetNotice(2);
       builder.setCurrentStep(3);
       renderer.goToStep(3);
       updatePrompt();
