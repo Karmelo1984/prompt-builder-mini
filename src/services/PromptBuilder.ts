@@ -76,15 +76,15 @@ export class PromptBuilder {
     outputs: string[];
   }): Array<[string, boolean]> {
     const state = this.getState();
+    const contextMinimal = Boolean(data.stack || data.why);
     return [
       ['Perfil seleccionado', Boolean(state.selectedProfile)],
       ['Plantilla seleccionada', Boolean(state.selectedTemplate)],
-      ['Rol técnico', Boolean(data.role && !data.role.includes('['))],
-      ['Stack indicado', Boolean(data.stack)],
+      ['Rol técnico/de negocio', Boolean(data.role && !data.role.includes('['))],
       ['Objetivo concreto', Boolean(data.objective && !data.objective.includes('['))],
-      ['Porqué/contexto de negocio', Boolean(data.why)],
-      ['Input mínimo pegado', Boolean(data.inputData)],
-      ['Restricciones explícitas', data.constraints.length > 0],
+      ['Contexto mínimo', contextMinimal],
+      ['Input verificable', Boolean(data.inputData)],
+      ['Restricciones', data.constraints.length > 0],
       ['Formato de salida', data.outputs.length > 0]
     ];
   }
