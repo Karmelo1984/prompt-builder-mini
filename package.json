@@ -1,5 +1,5 @@
 {
-  "name": "prompt-builder-mini",
+  "name": "prompt-builder",
   "version": "1.0.0",
   "description": "Wizard para generar prompts técnicos bien estructurados",
   "type": "module",

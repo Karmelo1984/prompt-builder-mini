@@ -1,4 +1,4 @@
-# Prompt Builder Wizard — Claude Code Instructions
+# Prompt Builder — Claude Code Instructions
 
 ## Project goal
 

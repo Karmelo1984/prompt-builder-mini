@@ -37,7 +37,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_BASE: /prompt-builder-mini/
+          VITE_BASE: /prompt-builder/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

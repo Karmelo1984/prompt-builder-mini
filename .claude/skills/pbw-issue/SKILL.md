@@ -1,6 +1,6 @@
 ---
 name: pbw-issue
-description: Use this skill when implementing one incremental issue in the Prompt Builder Wizard repository.
+description: Use this skill when implementing one incremental issue in the Prompt Builder repository.
 allowed-tools: Read Grep Glob Edit Write Bash
 ---
 

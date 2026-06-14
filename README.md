@@ -1,4 +1,4 @@
-# Prompt Builder Wizard · Programación IA
+# Prompt Builder · Programación IA
 
 Wizard interactivo de 5 pasos para construir prompts optimizados para GPT, Claude y Claude Code.
 
@@ -22,7 +22,7 @@ Abre `http://localhost:5173` en tu navegador.
 ## Estructura del proyecto
 
 ```
-prompt-builder-mini/
+prompt-builder/
 ├── src/
 │   ├── app.ts                    # Entrada principal (orquestación)
 │   ├── config/
@@ -171,12 +171,12 @@ Esta app está configurada para desplegarse automáticamente en GitHub Pages con
 1. Ve a **Settings → Pages**
 2. En **Source**, selecciona **GitHub Actions**
 3. Haz push a `main` o ejecuta el workflow manualmente desde la pestaña **Actions**
-4. El sitio se desplegará en: `https://karmelo1984.github.io/prompt-builder-mini/`
+4. El sitio se desplegará en: `https://karmelo1984.github.io/prompt-builder/`
 
 ### Cómo funciona
 
 - El workflow `.github/workflows/deploy-pages.yml` se ejecuta en cada push a `main`
-- Compila el proyecto con `npm run build` con `VITE_BASE=/prompt-builder-mini/`
+- Compila el proyecto con `npm run build` con `VITE_BASE=/prompt-builder/`
 - Sube el directorio `dist` a GitHub Pages
 - El build local (`npm run build` sin VITE_BASE) sigue siendo `/` por defecto
 
