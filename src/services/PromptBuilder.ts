@@ -116,48 +116,108 @@ export class PromptBuilder {
     return compact ? this.buildCompactPrompt(data) : this.buildXmlPrompt(data);
   }
 
+  private isMeaningfulText(value: string | undefined | null): boolean {
+    if (!value) return false;
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+    return !trimmed.startsWith('[') || !trimmed.endsWith(']');
+  }
+
+  private buildContextLines(data: PromptData): string[] {
+    const lines: string[] = [];
+    if (this.isMeaningfulText(data.project)) {
+      lines.push(`Proyecto/módulo: ${data.project}`);
+    }
+    if (this.isMeaningfulText(data.stack)) {
+      lines.push(`Stack/herramientas: ${data.stack}`);
+    }
+    if (this.isMeaningfulText(data.objective)) {
+      lines.push(`Objetivo: ${data.objective}`);
+    }
+    if (this.isMeaningfulText(data.why)) {
+      lines.push(`Motivo: ${data.why}`);
+    }
+    return lines;
+  }
+
   private buildXmlPrompt(data: PromptData): string {
     const blocks: string[] = [];
-    blocks.push(
-      `<rol>\nEres ${data.role}${data.stack ? ` especializado en ${data.stack}` : ''}. Prioriza soluciones simples, verificables y mantenibles.\n</rol>`
-    );
 
-    blocks.push(
-      `<contexto>\nProyecto/módulo: ${data.project || '[indica proyecto o módulo]'}\nObjetivo: ${data.objective}\nMotivo: ${data.why || '[explica por qué importa o qué restricción de negocio existe]'}\n</contexto>`
-    );
+    if (this.isMeaningfulText(data.role)) {
+      blocks.push(
+        `<rol>\nEres ${data.role}${data.stack ? ` especializado en ${data.stack}` : ''}. Prioriza soluciones simples, verificables y mantenibles.\n</rol>`
+      );
+    }
 
-    blocks.push(
-      `<input>\n${data.inputData || '[pega aquí código, traceback, query, criterios de aceptación o datos mínimos relevantes]'}\n</input>`
-    );
+    const contextLines = this.buildContextLines(data);
+    if (contextLines.length > 0) {
+      blocks.push(`<contexto>\n${contextLines.join('\n')}\n</contexto>`);
+    }
+
+    if (this.isMeaningfulText(data.inputData)) {
+      blocks.push(`<input>\n${data.inputData}\n</input>`);
+    }
 
     if (data.examples) {
       blocks.push(`<ejemplos>\n${data.examples}\n</ejemplos>`);
     }
 
-    blocks.push(
-      `<formato-salida>\nDevuelve exactamente:\n${this.numbered(data.outputs.length ? data.outputs : ['[selecciona la salida requerida en el paso 5]'])}\n</formato-salida>`
-    );
+    if (data.outputs.length > 0) {
+      blocks.push(
+        `<formato-salida>\nDevuelve exactamente:\n${this.numbered(data.outputs)}\n</formato-salida>`
+      );
+    }
 
-    blocks.push(
-      `<restricciones>\n${this.bullets(data.constraints.length ? data.constraints : ['[selecciona restricciones en el paso 4]', 'No inventes datos que no estén en el contexto.', 'Pregunta solo si falta información crítica.'])}\n</restricciones>`
-    );
+    if (data.constraints.length > 0) {
+      blocks.push(`<restricciones>\n${this.bullets(data.constraints)}\n</restricciones>`);
+    }
 
-    blocks.push(`<pregunta>\n${data.question}\n</pregunta>`);
+    if (this.isMeaningfulText(data.question)) {
+      blocks.push(`<pregunta>\n${data.question}\n</pregunta>`);
+    }
+
     return blocks.join('\n\n');
   }
 
   private buildCompactPrompt(data: PromptData): string {
-    const parts: string[] = [
-      `Eres ${data.role}${data.stack ? ` (${data.stack})` : ''}.`,
-      `Objetivo: ${data.objective}.`,
-      `Contexto: ${data.project || '[proyecto/módulo]'}${data.why ? `; motivo: ${data.why}` : ''}.`,
-      `Input: ${data.inputData || '[código/error/datos mínimos]'}.`,
-      `Salida: ${(data.outputs.length ? data.outputs : ['[selecciona salida requerida]']).join('; ')}.`,
-      `Restricciones: ${(data.constraints.length ? data.constraints : ['[selecciona restricciones]', 'no inventes datos']).join('; ')}.`
-    ];
-    if (data.examples) parts.push(`Ejemplo de formato: ${data.examples}.`);
-    parts.push(data.question);
-    return parts.join('\n');
+    const parts: string[] = [];
+
+    if (this.isMeaningfulText(data.role)) {
+      parts.push(`Eres ${data.role}${data.stack ? ` (${data.stack})` : ''}. Prioriza soluciones simples, verificables y mantenibles.`);
+    }
+
+    if (this.isMeaningfulText(data.objective)) {
+      parts.push(`Objetivo: ${data.objective}.`);
+    }
+
+    if (this.isMeaningfulText(data.project) || this.isMeaningfulText(data.why)) {
+      let contextStr = 'Contexto:';
+      if (this.isMeaningfulText(data.project)) contextStr += ` ${data.project}`;
+      if (this.isMeaningfulText(data.why)) contextStr += `; motivo: ${data.why}`;
+      parts.push(contextStr + '.');
+    }
+
+    if (this.isMeaningfulText(data.inputData)) {
+      parts.push(`Input: ${data.inputData}.`);
+    }
+
+    if (data.outputs.length > 0) {
+      parts.push(`Salida: ${data.outputs.join('; ')}.`);
+    }
+
+    if (data.constraints.length > 0) {
+      parts.push(`Restricciones: ${data.constraints.join('; ')}.`);
+    }
+
+    if (data.examples) {
+      parts.push(`Ejemplo de formato: ${data.examples}.`);
+    }
+
+    if (this.isMeaningfulText(data.question)) {
+      parts.push(data.question);
+    }
+
+    return parts.filter(p => p).join('\n');
   }
 
   private numbered(items: string[]): string {

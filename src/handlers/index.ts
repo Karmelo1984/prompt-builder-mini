@@ -67,6 +67,8 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
       if (templateData) {
         renderer.setFlagValue('role', templateData.role);
         renderer.setFlagValue('objective', templateData.objective);
+        renderer.setChecked('constraints', templateData.recommendedRestrictions ?? []);
+        renderer.setChecked('outputs', templateData.recommendedOutputs ?? []);
       }
       renderer.updateTemplateBadge();
       renderer.markRecommended();
