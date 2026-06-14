@@ -162,13 +162,32 @@ Renderer → maneja toda la lógica de DOM
 
 ---
 
+## Despliegue en GitHub Pages
+
+Esta app está configurada para desplegarse automáticamente en GitHub Pages con GitHub Actions.
+
+### Activar el despliegue
+
+1. Ve a **Settings → Pages**
+2. En **Source**, selecciona **GitHub Actions**
+3. Haz push a `main` o ejecuta el workflow manualmente desde la pestaña **Actions**
+4. El sitio se desplegará en: `https://karmelo1984.github.io/prompt-builder-mini/`
+
+### Cómo funciona
+
+- El workflow `.github/workflows/deploy-pages.yml` se ejecuta en cada push a `main`
+- Compila el proyecto con `npm run build` con `VITE_BASE=/prompt-builder-mini/`
+- Sube el directorio `dist` a GitHub Pages
+- El build local (`npm run build` sin VITE_BASE) sigue siendo `/` por defecto
+
+---
+
 ## Próximos pasos
 
 - [ ] Tests unitarios (Vitest)
 - [ ] Historial de prompts (IndexedDB)
 - [ ] Export/Import de configuraciones
 - [ ] Changelog automático
-- [ ] Despliegue en GitHub Pages
 
 ---
 
