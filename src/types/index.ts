@@ -6,6 +6,8 @@ export interface AppState {
 }
 
 export interface PromptData {
+  profile: string;
+  template: string;
   role: string;
   stack: string;
   project: string;

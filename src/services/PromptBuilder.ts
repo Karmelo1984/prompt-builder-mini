@@ -123,43 +123,48 @@ export class PromptBuilder {
     return !trimmed.startsWith('[') || !trimmed.endsWith(']');
   }
 
-  private buildContextLines(data: PromptData): string[] {
-    const lines: string[] = [];
-    if (this.isMeaningfulText(data.project)) {
-      lines.push(`Proyecto/módulo: ${data.project}`);
-    }
-    if (this.isMeaningfulText(data.stack)) {
-      lines.push(`Stack/herramientas: ${data.stack}`);
-    }
-    if (this.isMeaningfulText(data.objective)) {
-      lines.push(`Objetivo: ${data.objective}`);
-    }
-    if (this.isMeaningfulText(data.why)) {
-      lines.push(`Motivo: ${data.why}`);
-    }
-    return lines;
-  }
-
   private buildXmlPrompt(data: PromptData): string {
     const blocks: string[] = [];
 
     if (this.isMeaningfulText(data.role)) {
       blocks.push(
-        `<rol>\nEres ${data.role}${data.stack ? ` especializado en ${data.stack}` : ''}. Prioriza soluciones simples, verificables y mantenibles.\n</rol>`
+        `<rol>\nEres ${data.role}${data.stack ? ` especializado en ${data.stack}` : ''}.\n</rol>`
       );
     }
 
-    const contextLines = this.buildContextLines(data);
+    const tareaLines: string[] = [];
+    if (this.isMeaningfulText(data.profile)) {
+      tareaLines.push(`Perfil: ${data.profile}`);
+    }
+    if (this.isMeaningfulText(data.template)) {
+      tareaLines.push(`Plantilla: ${data.template}`);
+    }
+    if (this.isMeaningfulText(data.objective)) {
+      tareaLines.push(`Objetivo: ${data.objective}`);
+    }
+    if (this.isMeaningfulText(data.why)) {
+      tareaLines.push(`Motivo: ${data.why}`);
+    }
+    if (tareaLines.length > 0) {
+      blocks.push(`<tarea>\n${tareaLines.join('\n')}\n</tarea>`);
+    }
+
+    const contextLines: string[] = [];
+    if (this.isMeaningfulText(data.project)) {
+      contextLines.push(`Proyecto/módulo: ${data.project}`);
+    }
+    if (this.isMeaningfulText(data.stack)) {
+      contextLines.push(`Stack/herramientas: ${data.stack}`);
+    }
+    if (this.isMeaningfulText(data.inputData)) {
+      contextLines.push(`Información relevante:\n${data.inputData}`);
+    }
     if (contextLines.length > 0) {
       blocks.push(`<contexto>\n${contextLines.join('\n')}\n</contexto>`);
     }
 
-    if (this.isMeaningfulText(data.inputData)) {
-      blocks.push(`<input>\n${data.inputData}\n</input>`);
-    }
-
-    if (data.examples) {
-      blocks.push(`<ejemplos>\n${data.examples}\n</ejemplos>`);
+    if (data.constraints.length > 0) {
+      blocks.push(`<restricciones>\n${this.bullets(data.constraints)}\n</restricciones>`);
     }
 
     if (data.outputs.length > 0) {
@@ -168,12 +173,12 @@ export class PromptBuilder {
       );
     }
 
-    if (data.constraints.length > 0) {
-      blocks.push(`<restricciones>\n${this.bullets(data.constraints)}\n</restricciones>`);
-    }
-
     if (this.isMeaningfulText(data.question)) {
       blocks.push(`<pregunta>\n${data.question}\n</pregunta>`);
+    }
+
+    if (data.examples) {
+      blocks.push(`<ejemplos>\n${data.examples}\n</ejemplos>`);
     }
 
     return blocks.join('\n\n');
@@ -183,30 +188,40 @@ export class PromptBuilder {
     const parts: string[] = [];
 
     if (this.isMeaningfulText(data.role)) {
-      parts.push(`Eres ${data.role}${data.stack ? ` (${data.stack})` : ''}. Prioriza soluciones simples, verificables y mantenibles.`);
+      parts.push(`Eres ${data.role}${data.stack ? ` (${data.stack})` : ''}.`);
     }
 
+    const taskParts: string[] = [];
+    if (this.isMeaningfulText(data.profile)) {
+      taskParts.push(`perfil: ${data.profile}`);
+    }
+    if (this.isMeaningfulText(data.template)) {
+      taskParts.push(`plantilla: ${data.template}`);
+    }
     if (this.isMeaningfulText(data.objective)) {
-      parts.push(`Objetivo: ${data.objective}.`);
+      taskParts.push(`objetivo: ${data.objective}`);
+    }
+    if (this.isMeaningfulText(data.why)) {
+      taskParts.push(`motivo: ${data.why}`);
+    }
+    if (taskParts.length > 0) {
+      parts.push(`Tarea: ${taskParts.join('; ')}.`);
     }
 
-    if (this.isMeaningfulText(data.project) || this.isMeaningfulText(data.why)) {
-      let contextStr = 'Contexto:';
-      if (this.isMeaningfulText(data.project)) contextStr += ` ${data.project}`;
-      if (this.isMeaningfulText(data.why)) contextStr += `; motivo: ${data.why}`;
-      parts.push(contextStr + '.');
+    if (this.isMeaningfulText(data.project)) {
+      parts.push(`Proyecto: ${data.project}.`);
     }
 
     if (this.isMeaningfulText(data.inputData)) {
       parts.push(`Input: ${data.inputData}.`);
     }
 
-    if (data.outputs.length > 0) {
-      parts.push(`Salida: ${data.outputs.join('; ')}.`);
-    }
-
     if (data.constraints.length > 0) {
       parts.push(`Restricciones: ${data.constraints.join('; ')}.`);
+    }
+
+    if (data.outputs.length > 0) {
+      parts.push(`Salida: ${data.outputs.join('; ')}.`);
     }
 
     if (data.examples) {

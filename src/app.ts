@@ -31,6 +31,8 @@ function updatePrompt(): void {
   const templateData = builder.getPromptTemplateData();
   const compact = renderer.isCompactMode();
 
+  const profile = builder.getProfileLabel();
+  const template = builder.getTemplateLabel();
   const role = renderer.getFlagValue('role') || templateData?.role || '[rol técnico concreto]';
   const stack = renderer.getFlagValue('stack');
   const project = renderer.getFlagValue('project');
@@ -44,6 +46,8 @@ function updatePrompt(): void {
     templateData?.question || '¿Cuál es la respuesta correcta con el mínimo contexto necesario y cómo la verifico?';
 
   const data: PromptData = {
+    profile,
+    template,
     role,
     stack,
     project,
