@@ -50,3 +50,24 @@ export type FlowCatalog = Record<string, FlowCatalogItem>;
 export type PromptTypes = Record<string, PromptTypeItem>;
 export type ConstraintCatalog = Record<string, string>;
 export type OutputCatalog = Record<string, string>;
+
+export interface ProfileItem {
+  label: string;
+  description: string;
+  recommendedTemplates?: string[];
+  recommendedRestrictions?: string[];
+  recommendedOutputs?: string[];
+}
+
+export interface PromptTemplateItem {
+  label: string;
+  description: string;
+  role: string;
+  objective: string;
+  recommendedRestrictions?: string[];
+  recommendedOutputs?: string[];
+  question: string;
+}
+
+export type ProfileCatalog = Record<string, ProfileItem>;
+export type PromptTemplateCatalog = Record<string, PromptTemplateItem>;

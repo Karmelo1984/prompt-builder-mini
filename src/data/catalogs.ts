@@ -1,4 +1,4 @@
-import type { FlowCatalog, PromptTypes, ConstraintCatalog, OutputCatalog } from '../types/index';
+import type { FlowCatalog, PromptTypes, ConstraintCatalog, OutputCatalog, ProfileCatalog, PromptTemplateCatalog } from '../types/index';
 
 export const flowCatalog: FlowCatalog = {
   fix: {
@@ -192,3 +192,389 @@ export const tips: string[] = [
   'Abre conversación nueva al cambiar de tarea para no pagar historial viejo.',
   'Usa modo compacto para tareas simples; usa XML cuando haya contexto largo o varios bloques.'
 ];
+
+export const profileCatalog: ProfileCatalog = {
+  'product-owner': {
+    label: 'Product Owner',
+    description: 'Enfocado en definición de requisitos, priorización y valor de negocio.'
+  },
+  'qa-manual': {
+    label: 'QA Manual',
+    description: 'Especializado en casos de prueba, escenarios y validación manual.'
+  },
+  'qa-automation': {
+    label: 'QA Automation',
+    description: 'Enfocado en tests automatizados, cobertura y confiabilidad.'
+  },
+  'developer': {
+    label: 'Developer',
+    description: 'Senior developer enfocado en calidad, testing y mantenibilidad del código.'
+  },
+  'tech-lead': {
+    label: 'Tech Lead / Architect',
+    description: 'Especializado en decisiones técnicas, arquitectura y deuda técnica.'
+  },
+  'product-designer': {
+    label: 'Product Designer / UX',
+    description: 'Enfocado en experiencia de usuario, flujos y componentes.'
+  },
+  'data-analyst': {
+    label: 'Data Analyst',
+    description: 'Especializado en métricas, análisis SQL y dashboards.'
+  },
+  'devops-sre': {
+    label: 'DevOps / SRE',
+    description: 'Enfocado en incidentes, despliegues y confiabilidad de sistemas.'
+  }
+};
+
+export const promptTemplateCatalog: PromptTemplateCatalog = {
+  // Product Owner Templates
+  'user-story': {
+    label: 'Historia de usuario',
+    description: 'Redactar historias claras con criterios y aceptación.',
+    role: 'product manager experto en historias de usuario bien estructuradas',
+    objective: 'redactar una historia clara con criterios de aceptación verificables',
+    recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
+    recommendedOutputs: ['summary', 'cases', 'questions'],
+    question: '¿Cómo redactarías esta historia de usuario con criterios claros?'
+  },
+  'acceptance-criteria': {
+    label: 'Criterios de aceptación',
+    description: 'Definir criterios Gherkin o escenarios de aceptación.',
+    role: 'product owner especializado en criterios de aceptación verificables',
+    objective: 'definir criterios Gherkin concisos y verificables',
+    recommendedRestrictions: ['edgeCases', 'separateFacts'],
+    recommendedOutputs: ['cases', 'table'],
+    question: '¿Cuáles son los criterios Gherkin esenciales para esta funcionalidad?'
+  },
+  'refinement': {
+    label: 'Refinamiento',
+    description: 'Preparar una épica o feature para sprint.',
+    role: 'product owner experto en refinamiento de requisitos',
+    objective: 'desglosar una épica en historias estimables y independientes',
+    recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
+    recommendedOutputs: ['plan', 'table', 'questions'],
+    question: '¿Cómo desglosaría esta épica en historias estimables?'
+  },
+  'prioritization': {
+    label: 'Priorización',
+    description: 'Evaluar y priorizar requisitos por valor e impacto.',
+    role: 'product manager estratégico especializado en priorización de valor',
+    objective: 'evaluar alternativas y recomendar orden de implementación por impacto',
+    recommendedRestrictions: ['stateAssumptions', 'separateFacts'],
+    recommendedOutputs: ['table', 'decision', 'risks'],
+    question: '¿Cómo priorizarías estos requisitos por valor e impacto?'
+  },
+  'impact-analysis': {
+    label: 'Análisis de impacto',
+    description: 'Evaluar riesgos, beneficios y dependencias de un cambio.',
+    role: 'product strategist especializado en análisis de impacto',
+    objective: 'evaluar impacto de negocio, riesgos y dependencias',
+    recommendedRestrictions: ['stateAssumptions', 'separateFacts'],
+    recommendedOutputs: ['table', 'risks', 'nextSteps'],
+    question: '¿Cuál es el impacto esperado y qué riesgos o dependencias hay?'
+  },
+
+  // QA Manual Templates
+  'test-cases': {
+    label: 'Casos de prueba',
+    description: 'Crear casos de prueba paso a paso para validación manual.',
+    role: 'QA manual especializado en casos de prueba detallados y reproducibles',
+    objective: 'redactar casos de prueba paso a paso con resultados esperados',
+    recommendedRestrictions: ['edgeCases', 'separateFacts'],
+    recommendedOutputs: ['cases', 'table'],
+    question: '¿Cuáles son los casos de prueba esenciales con pasos exactos?'
+  },
+  'gherkin-scenarios': {
+    label: 'Escenarios Gherkin',
+    description: 'Escribir escenarios Gherkin (Given/When/Then) para validación.',
+    role: 'QA especializado en BDD y escenarios Gherkin claros',
+    objective: 'redactar escenarios Gherkin Given/When/Then para cada caso',
+    recommendedRestrictions: ['preferSimple', 'edgeCases'],
+    recommendedOutputs: ['cases', 'testCode'],
+    question: '¿Cuáles son los escenarios Given/When/Then para esta funcionalidad?'
+  },
+  'bug-report': {
+    label: 'Bug report',
+    description: 'Redactar reportes de bug con contexto, pasos y evidencia.',
+    role: 'QA especializado en reportes detallados y reproducibles',
+    objective: 'redactar un reporte de bug claro con pasos reproducibles y evidencia',
+    recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
+    recommendedOutputs: ['summary', 'cases', 'risks'],
+    question: '¿Cuál es el reporte de bug claro con pasos reproducibles?'
+  },
+  'regression-checklist': {
+    label: 'Checklist de regresión',
+    description: 'Crear checklist para validar regresiones después de cambios.',
+    role: 'QA experto en cobertura de regresión y casos críticos',
+    objective: 'listar casos críticos para validar que no haya regresiones',
+    recommendedRestrictions: ['edgeCases', 'separateFacts'],
+    recommendedOutputs: ['cases', 'table'],
+    question: '¿Cuáles son los casos críticos para validar regresiones?'
+  },
+  'exploratory-testing': {
+    label: 'Pruebas exploratorias',
+    description: 'Plan y charter para testing exploratorio sistemático.',
+    role: 'QA explorador especializado en testing fuera de guión',
+    objective: 'diseñar charter y estrategia para testing exploratorio efectivo',
+    recommendedRestrictions: ['edgeCases', 'separateFacts'],
+    recommendedOutputs: ['plan', 'cases', 'risks'],
+    question: '¿Cuál es el charter de testing exploratorio para este área?'
+  },
+
+  // QA Automation Templates
+  'automated-tests': {
+    label: 'Tests automatizados',
+    description: 'Escribir tests unitarios, integración o e2e.',
+    role: 'QA automation engineer especializado en tests deterministas',
+    objective: 'escribir suite de tests automatizados confiables y mantenibles',
+    recommendedRestrictions: ['noFragileTests', 'blackBox', 'edgeCases'],
+    recommendedOutputs: ['testCode', 'commands', 'mocks'],
+    question: '¿Cuál es el código exacto de tests automatizados con buena cobertura?'
+  },
+  'mocks-stubs': {
+    label: 'Mocks/stubs',
+    description: 'Diseñar mocks, stubs y test doubles necesarios.',
+    role: 'QA automation especializado en test doubles y aislamientos',
+    objective: 'diseñar mocks/stubs para aislar componentes bajo test',
+    recommendedRestrictions: ['preferSimple', 'blackBox'],
+    recommendedOutputs: ['testCode', 'mocks', 'commands'],
+    question: '¿Cuáles son los mocks/stubs necesarios para esta prueba?'
+  },
+  'flaky-tests-review': {
+    label: 'Revisión de flaky tests',
+    description: 'Analizar y corregir tests inestables o flakys.',
+    role: 'QA automation especializado en diagnóstico de test flakys',
+    objective: 'identificar causa de flakiness y proponer fix',
+    recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
+    recommendedOutputs: ['cause', 'fixes', 'testCode', 'risks'],
+    question: '¿Cuál es la causa del flakiness y cómo lo arreglarías?'
+  },
+  'coverage-strategy': {
+    label: 'Estrategia de cobertura',
+    description: 'Definir estrategia de cobertura (unit, integration, e2e).',
+    role: 'QA lead especializado en estrategia de testing integral',
+    objective: 'definir estrategia de cobertura por nivel de test',
+    recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
+    recommendedOutputs: ['plan', 'table', 'commands'],
+    question: '¿Cuál es la mejor estrategia de cobertura para este código?'
+  },
+
+  // Developer Templates
+  'debug': {
+    label: 'Debug / traceback',
+    description: 'Encontrar causa raíz y aplicar el cambio mínimo.',
+    role: 'senior developer con foco en diagnóstico rápido y cambios mínimos',
+    objective: 'localizar la causa raíz y proponer un fix mínimo verificable',
+    recommendedRestrictions: ['noRefactor', 'noDeps', 'noApi'],
+    recommendedOutputs: ['causa', 'diff', 'test', 'riesgos'],
+    question: '¿Qué causa el error y cuál es el cambio mínimo seguro para corregirlo?'
+  },
+  'feature': {
+    label: 'Feature',
+    description: 'Implementar funcionalidad nueva con criterios de aceptación.',
+    role: 'senior developer orientado a producción y mantenibilidad',
+    objective: 'implementar funcionalidad con cambio mínimo mantenible',
+    recommendedRestrictions: ['backwardCompatibility', 'noDeps', 'smallSteps'],
+    recommendedOutputs: ['plan', 'files', 'diff', 'tests', 'commands'],
+    question: '¿Cómo implementarías esta funcionalidad de forma mínima y mantenible?'
+  },
+  'refactor-safe': {
+    label: 'Refactor seguro',
+    description: 'Mejorar estructura sin cambiar comportamiento observable.',
+    role: 'senior developer especializado en refactors seguros',
+    objective: 'mejorar estructura interna manteniendo comportamiento idéntico',
+    recommendedRestrictions: ['noApi', 'noDeps', 'sameBehavior', 'smallSteps'],
+    recommendedOutputs: ['plan', 'diff', 'tests', 'risks'],
+    question: '¿Cuál es el refactor más seguro y cómo verifico que no cambió el comportamiento?'
+  },
+  'code-review': {
+    label: 'Code review',
+    description: 'Revisar código detectando bugs, riesgos y mejoras reales.',
+    role: 'reviewer senior especializado en bugs, seguridad y rendimiento',
+    objective: 'revisar priorizando problemas reales sobre estilo menor',
+    recommendedRestrictions: ['noStyleNitpicks', 'markOpinions', 'noBigRewrite'],
+    recommendedOutputs: ['table', 'severity', 'fixes', 'risks'],
+    question: '¿Qué problemas reales ves y qué fix recomendarías para cada uno?'
+  },
+  'tests-dev': {
+    label: 'Tests',
+    description: 'Crear tests unitarios, integración o e2e con buen coverage.',
+    role: 'QA automation engineer experto en tests deterministas',
+    objective: 'diseñar tests que cubran casos críticos y bordes',
+    recommendedRestrictions: ['noFragileTests', 'blackBox', 'edgeCases'],
+    recommendedOutputs: ['cases', 'testCode', 'commands', 'mocks'],
+    question: '¿Qué tests esenciales añadirías y cuál es el código exacto?'
+  },
+  'sql-performance': {
+    label: 'SQL / rendimiento',
+    description: 'Optimizar query, índices o diagnóstico de datos.',
+    role: 'DBA senior especializado en PostgreSQL y optimización',
+    objective: 'mejorar query sin cambiar resultado lógico',
+    recommendedRestrictions: ['sameResult', 'noSchemaChangeUnlessNeeded', 'explainAssumptions'],
+    recommendedOutputs: ['cause', 'query', 'indexes', 'explain', 'risks'],
+    question: '¿Cómo optimizarías esta consulta y qué verificaciones harías?'
+  },
+  'migration-dev': {
+    label: 'Migración',
+    description: 'Migrar entre tecnologías o versiones con bajo riesgo.',
+    role: 'senior developer especializado en migraciones incrementales',
+    objective: 'migrar código minimizando riesgo y manteniendo comportamiento',
+    recommendedRestrictions: ['smallSteps', 'sameBehavior', 'noDeps', 'backwardCompatibility'],
+    recommendedOutputs: ['plan', 'mapping', 'diff', 'tests', 'risks'],
+    question: '¿Cuál es el plan de migración más seguro y verificable?'
+  },
+
+  // Tech Lead / Architect Templates
+  'adr': {
+    label: 'ADR (Architecture Decision Record)',
+    description: 'Documentar decisión arquitectónica con contexto y rationale.',
+    role: 'arquitecto pragmático especializado en ADRs claros',
+    objective: 'redactar ADR con contexto, decisión y consecuencias',
+    recommendedRestrictions: ['stateAssumptions', 'preferSimple'],
+    recommendedOutputs: ['summary', 'options', 'decision', 'risks'],
+    question: '¿Cuál es el ADR para esta decisión arquitectónica?'
+  },
+  'technical-tradeoffs': {
+    label: 'Trade-offs técnicos',
+    description: 'Comparar opciones técnicas evaluando trade-offs.',
+    role: 'arquitecto de software pragmático orientado a decisiones reversibles',
+    objective: 'comparar alternativas técnicas con trade-offs claros',
+    recommendedRestrictions: ['noHype', 'stateAssumptions', 'preferSimple'],
+    recommendedOutputs: ['options', 'tradeoffs', 'decision', 'risks'],
+    question: '¿Qué opción elegirías y bajo qué supuestos cambiaría la decisión?'
+  },
+  'architecture-design': {
+    label: 'Diseño arquitectónico',
+    description: 'Diseñar arquitectura o componentes con diagramas.',
+    role: 'arquitecto especializado en diseño modular y escalable',
+    objective: 'diseñar arquitectura clara con componentes y flujos',
+    recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
+    recommendedOutputs: ['summary', 'plan', 'nextSteps', 'risks'],
+    question: '¿Cuál es el diseño arquitectónico recomendado?'
+  },
+  'technical-debt': {
+    label: 'Deuda técnica',
+    description: 'Evaluar, priorizar y estrategia de deuda técnica.',
+    role: 'tech lead especializado en evaluación de deuda técnica',
+    objective: 'evaluar deuda técnica y proponer estrategia de amortización',
+    recommendedRestrictions: ['preferSimple', 'stateAssumptions', 'separateFacts'],
+    recommendedOutputs: ['table', 'risks', 'plan', 'nextSteps'],
+    question: '¿Cuál es la deuda técnica prioritaria y cómo la abordarías?'
+  },
+
+  // Product Designer / UX Templates
+  'ux-heuristic': {
+    label: 'Análisis heurístico UX',
+    description: 'Evaluar usabilidad contra heurísticas de Nielsen.',
+    role: 'UX specialist experto en heurísticas de usabilidad',
+    objective: 'evaluar interfaz contra heurísticas y proponer mejoras',
+    recommendedRestrictions: ['separateFacts', 'markOpinions'],
+    recommendedOutputs: ['table', 'fixes', 'risks'],
+    question: '¿Cuáles son los problemas de usabilidad principales?'
+  },
+  'user-flow': {
+    label: 'User flow',
+    description: 'Diseñar o evaluar flujos de usuario paso a paso.',
+    role: 'product designer especializado en user flows claros',
+    objective: 'diseñar user flow optimizado para el caso de uso',
+    recommendedRestrictions: ['preferSimple', 'stateAssumptions'],
+    recommendedOutputs: ['summary', 'flow', 'commands'],
+    question: '¿Cuál es el flujo de usuario óptimo para esta tarea?'
+  },
+  'microcopy': {
+    label: 'Microcopy',
+    description: 'Redactar textos pequeños claros y consistentes en UI.',
+    role: 'content strategist especializado en microcopy clara',
+    objective: 'redactar textos pequeños consistentes y precisos',
+    recommendedRestrictions: ['preferSimple', 'separateFacts'],
+    recommendedOutputs: ['testCode', 'table'],
+    question: '¿Cuál es la microcopy clara y consistente para esta UI?'
+  },
+  'ui-states': {
+    label: 'Estados UI',
+    description: 'Documentar estados UI (idle, loading, error, success, etc).',
+    role: 'product designer especializado en documentación de estados',
+    objective: 'documentar todos los estados posibles de un componente',
+    recommendedRestrictions: ['edgeCases', 'preferSimple'],
+    recommendedOutputs: ['table', 'summary'],
+    question: '¿Cuáles son todos los estados posibles y el comportamiento de cada uno?'
+  },
+
+  // Data Analyst Templates
+  'metric-definition': {
+    label: 'Definición de métrica',
+    description: 'Definir métrica clara con cálculo exacto.',
+    role: 'data analyst especializado en definiciones de métricas',
+    objective: 'definir métrica con cálculo exacto, numerador/denominador',
+    recommendedRestrictions: ['stateAssumptions', 'separateFacts'],
+    recommendedOutputs: ['summary', 'query', 'questions'],
+    question: '¿Cuál es la definición exacta de esta métrica?'
+  },
+  'sql-analysis': {
+    label: 'SQL análisis',
+    description: 'Escribir query SQL para extraer datos y analizar.',
+    role: 'data analyst especializado en SQL y análisis exploratorio',
+    objective: 'escribir query SQL para validar hipótesis o explorar datos',
+    recommendedRestrictions: ['sameResult', 'explainAssumptions'],
+    recommendedOutputs: ['query', 'commands', 'explanation'],
+    question: '¿Cuál es la query SQL para responder esta pregunta?'
+  },
+  'dashboard-spec': {
+    label: 'Dashboard spec',
+    description: 'Especificar dashboard con métricas, filtros y diseño.',
+    role: 'analytics engineer especializado en specs de dashboards',
+    objective: 'especificar dashboard con métricas, visualizaciones y filtros',
+    recommendedRestrictions: ['stateAssumptions', 'preferSimple'],
+    recommendedOutputs: ['plan', 'table', 'questions'],
+    question: '¿Cuál es la spec completa del dashboard?'
+  },
+  'results-interpretation': {
+    label: 'Interpretación de resultados',
+    description: 'Interpretar datos, validar supuestos y conclusiones.',
+    role: 'data scientist especializado en interpretación crítica',
+    objective: 'interpretar resultados validando supuestos y conclusiones',
+    recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
+    recommendedOutputs: ['summary', 'risks', 'questions'],
+    question: '¿Cuál es la interpretación correcta de estos datos?'
+  },
+
+  // DevOps / SRE Templates
+  'incident-diagnosis': {
+    label: 'Diagnóstico de incidente',
+    description: 'Diagnosticar raíz de incidente y proponer mitigación.',
+    role: 'SRE especializado en diagnóstico rápido de incidentes',
+    objective: 'diagnosticar causa raíz e impacto del incidente',
+    recommendedRestrictions: ['separateFacts', 'stateAssumptions', 'priorizarBloqueante'],
+    recommendedOutputs: ['summary', 'cause', 'fixes', 'risks'],
+    question: '¿Cuál es la causa raíz del incidente y el fix inmediato?'
+  },
+  'runbook': {
+    label: 'Runbook',
+    description: 'Escribir runbook para mitigación manual de incidente.',
+    role: 'SRE especializado en runbooks claros y probados',
+    objective: 'escribir runbook paso a paso para responder incidentes',
+    recommendedRestrictions: ['preferSimple', 'edgeCases'],
+    recommendedOutputs: ['plan', 'cases', 'commands'],
+    question: '¿Cuál es el runbook exacto paso a paso para este incidente?'
+  },
+  'postmortem': {
+    label: 'Postmortem',
+    description: 'Redactar postmortem de incidente sin culpa.',
+    role: 'SRE especializado en postmortems constructivos',
+    objective: 'redactar postmortem analizando causa raíz y mejoras',
+    recommendedRestrictions: ['separateFacts', 'stateAssumptions'],
+    recommendedOutputs: ['summary', 'flow', 'nextSteps', 'risks'],
+    question: '¿Cuál es el postmortem con aprendizajes y acciones?'
+  },
+  'deploy-checklist': {
+    label: 'Checklist de despliegue',
+    description: 'Crear checklist de pre/durante/post despliegue.',
+    role: 'DevOps especializado en checklists de despliegue seguros',
+    objective: 'crear checklist de pasos pre/durante/post despliegue',
+    recommendedRestrictions: ['preferSimple', 'edgeCases'],
+    recommendedOutputs: ['cases', 'table', 'commands'],
+    question: '¿Cuál es el checklist completo para un despliegue seguro?'
+  }
+};
