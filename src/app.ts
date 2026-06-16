@@ -1,25 +1,30 @@
 import type { PromptData } from './types/index';
-import { constraintCatalog, outputCatalog } from './data/catalogs';
-import { CatalogValidator } from './data/catalogValidation';
+import { CatalogRepository } from './domain/catalog/catalog-repository';
+import { LocalBuilderOptionsRepository } from './infrastructure/builder-options/local-builder-options-repository';
+import { buildBuilderScreenModel } from './application/builder/buildBuilderScreenModel';
 import { PromptBuilder } from './services/PromptBuilder';
 import { Renderer } from './ui/renderer';
 import { bindEvents } from './handlers/index';
 
 const builder = new PromptBuilder();
 const renderer = new Renderer(builder);
+const bundle = CatalogRepository.getBundle();
+const catalogIndex = CatalogRepository.getIndex();
+const optionsRepository = new LocalBuilderOptionsRepository(catalogIndex);
 
 const fields = ['stack', 'role', 'project', 'objective', 'why', 'inputData', 'examples'];
 
 function init(): void {
-  const catalogErrors = CatalogValidator.validate();
-  if (catalogErrors.length > 0) {
-    console.error('[CatalogValidator]', catalogErrors);
+  const catalogValidation = CatalogRepository.getValidation();
+  if (catalogValidation.errors.length > 0) {
+    console.error('[CatalogValidator]', catalogValidation.errors);
   }
-  renderer.renderProfiles();
-  renderer.renderTemplates();
-  renderer.renderChecks('constraints', constraintCatalog);
-  renderer.renderChecks('outputs', outputCatalog);
-  renderer.renderTips();
+  const screenModel = buildBuilderScreenModel(builder.getState(), catalogIndex, optionsRepository);
+  renderer.renderProfiles(screenModel.catalogs.profiles);
+  renderer.renderTemplates(screenModel.catalogs.templates);
+  renderer.renderChecks('constraints', screenModel.catalogs.constraints);
+  renderer.renderChecks('outputs', screenModel.catalogs.outputFormats);
+  renderer.renderTips(bundle.tips);
   renderer.renderFooter();
   bindEvents(builder, renderer, fields, updatePrompt);
   renderer.goToStep(1);
@@ -40,8 +45,9 @@ function updatePrompt(): void {
   const why = renderer.getFlagValue('why');
   const inputData = renderer.getFlagValue('inputData');
   const examples = renderer.getFlagValue('examples');
-  const constraints = renderer.getChecked('constraints').map(k => constraintCatalog[k]);
-  const outputs = renderer.getChecked('outputs').map(k => outputCatalog[k]);
+  const screenModel = buildBuilderScreenModel(state, catalogIndex, optionsRepository);
+  const constraints = renderer.getChecked('constraints').map(k => screenModel.catalogs.constraints[k]);
+  const outputs = renderer.getChecked('outputs').map(k => screenModel.catalogs.outputFormats[k]);
   const question =
     templateData?.question || '¿Cuál es la respuesta correcta con el mínimo contexto necesario y cómo la verifico?';
 

@@ -1,9 +1,8 @@
 ---
-
 name: pbw-commit
 description: Use this skill to generate a Spanish Conventional Commit message from the current git changes in the Prompt Builder repository.
 allowed-tools: Bash
--------------------
+---
 
 # Spanish commit message generator
 
@@ -27,6 +26,10 @@ The message must follow Conventional Commits format and must describe what reall
 * Keep the message concise, specific, and reviewable.
 * Use Spanish for the summary and body.
 * Use English only for Conventional Commits keywords, for example `feat`, `fix`, `docs`, `BREAKING CHANGE`.
+* Prefer staged changes when present.
+* If staged changes exist, generate the commit message only from staged changes.
+* If no staged changes exist, generate the commit message from unstaged and untracked changes.
+* Do not read large generated files, binary files, dependency folders, build outputs, coverage outputs, or lockfile diffs unless they are the main change.
 
 ## Process
 
@@ -36,15 +39,13 @@ The message must follow Conventional Commits format and must describe what reall
    git status --short
    ```
 
-2. Inspect unstaged changes:
+2. Determine whether staged changes exist:
 
    ```bash
-   git diff --stat
-   git diff --name-only
-   git diff
+   git diff --cached --name-only
    ```
 
-3. Inspect staged changes:
+3. If staged changes exist, inspect only staged changes:
 
    ```bash
    git diff --cached --stat
@@ -52,13 +53,21 @@ The message must follow Conventional Commits format and must describe what reall
    git diff --cached
    ```
 
-4. Inspect untracked files:
+4. If there are no staged changes, inspect unstaged changes:
+
+   ```bash
+   git diff --stat
+   git diff --name-only
+   git diff
+   ```
+
+5. If there are no staged changes, inspect untracked files:
 
    ```bash
    git ls-files --others --exclude-standard
    ```
 
-5. If there are untracked files, inspect their content when they are relevant text files.
+6. If there are untracked files, inspect their content only when they are relevant text files.
 
    Prefer safe read-only commands such as:
 
@@ -66,15 +75,43 @@ The message must follow Conventional Commits format and must describe what reall
    sed -n '1,220p' <file>
    ```
 
-   Do not inspect large generated files unless needed.
+7. Avoid dumping very large diffs into context.
 
-6. Determine the commit type.
+   If the diff is large:
 
-7. Determine the scope only if it is clear.
+   * inspect `git diff --stat`;
+   * inspect `git diff --name-only`;
+   * inspect only the most relevant files;
+   * summarize based on concrete file-level changes.
 
-8. Generate the commit message.
+8. Determine whether the changes form one coherent commit.
 
-9. Return only the requested output format.
+9. If the changes are clearly unrelated, return split commit suggestions instead of forcing one vague commit.
+
+10. Determine the commit type.
+
+11. Determine the scope only if it is clear.
+
+12. Generate the commit message.
+
+13. Return only the requested output format.
+
+## Commit selection rules
+
+If staged changes exist:
+
+* Generate the message only for staged changes.
+* Ignore unstaged and untracked changes unless the user explicitly asks to include them.
+
+If no staged changes exist:
+
+* Generate the message for unstaged and relevant untracked changes.
+
+If there are no staged, unstaged, or untracked changes, return:
+
+```text
+No hay cambios en git para generar un mensaje de commit.
+```
 
 ## Commit type rules
 
@@ -99,10 +136,13 @@ Examples:
 * Changes in `.github/workflows/*` usually use `ci`.
 * Changes in `package.json` or `package-lock.json` usually use `build`, unless they are only metadata.
 * Changes only in `README.md` usually use `docs`.
+* Changes only in `docs/*` usually use `docs`.
 * Changes only in `.claude/*` usually use `chore` or `docs`, depending on whether they document usage or configure assistant behavior.
 * Changes in source code that add user-facing behavior usually use `feat`.
 * Changes in source code that correct broken behavior usually use `fix`.
 * Changes that simplify code without changing behavior usually use `refactor`.
+* Changes that only move files or reorganize internals without behavior change usually use `refactor`.
+* Changes that update generated documentation snapshots usually use `docs`.
 
 ## Scope rules
 
@@ -111,7 +151,9 @@ Use a scope only when it is clear from the changed files or affected module.
 Preferred scopes for this repository:
 
 * `app`
+* `architecture`
 * `builder`
+* `catalog`
 * `wizard`
 * `prompts`
 * `profiles`
@@ -185,7 +227,8 @@ When adding a body:
 * Maximum 4 bullets.
 * Each bullet must be based on the actual diff.
 * Do not repeat the title.
-* Do not mention validation commands unless the diff includes validation-related changes.
+* Do not mention validation commands unless validation output files or documentation were changed.
+* Do not claim that build, lint, or tests passed unless the user provided that result or the diff includes that evidence.
 
 Example:
 
@@ -196,6 +239,31 @@ feat(profiles): añade perfiles de uso para generación de prompts
 - conecta las plantillas disponibles con cada perfil
 - mantiene la configuración tipada sin introducir código muerto
 ```
+
+## Split commit rules
+
+If the diff clearly contains unrelated changes, return split commit suggestions.
+
+Use this format:
+
+```text
+Suggested split commits
+
+1. <type>(<scope>): <resumen en castellano>
+
+2. <type>(<scope>): <resumen en castellano>
+```
+
+Only suggest split commits when the separation is obvious from the diff.
+
+Examples of unrelated changes:
+
+* source refactor + CI workflow change
+* documentation rewrite + dependency update
+* Claude skill changes + app feature changes
+* unrelated bug fixes in different modules
+
+If the changes are related to one issue or one architectural phase, prefer a single commit with a concise body.
 
 ## Breaking changes
 
@@ -222,12 +290,22 @@ No hay cambios en git para generar un mensaje de commit.
 
 ## Output format
 
-Return only this:
+For a single commit, return only this:
 
 ```text
 Suggested commit message
 
 <commit message>
+```
+
+For split commits, return only this:
+
+```text
+Suggested split commits
+
+1. <commit message>
+
+2. <commit message>
 ```
 
 Do not add explanations before or after the output.
@@ -266,4 +344,12 @@ ci(pages): ajusta el despliegue de GitHub Pages
 Suggested commit message
 
 chore(claude): añade skill para commits convencionales en castellano
+```
+
+```text
+Suggested split commits
+
+1. refactor(catalog): desacopla la resolución de opciones del builder
+
+2. docs(architecture): documenta el nuevo flujo de catálogo dinámico
 ```

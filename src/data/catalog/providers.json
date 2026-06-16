@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "generic",
+      "label": "Generic LLM",
+      "description": "Modelo de lenguaje genérico compatible con múltiples proveedores."
+    },
+    {
+      "id": "chatgpt",
+      "label": "ChatGPT",
+      "description": "Familia de modelos GPT de OpenAI, incluyendo GPT-4 y variantes."
+    },
+    {
+      "id": "claude",
+      "label": "Claude",
+      "description": "Modelo de lenguaje Claude de Anthropic para aplicaciones generales."
+    },
+    {
+      "id": "claude_code",
+      "label": "Claude Code",
+      "description": "Claude integrado en la herramienta Claude Code para tareas de desarrollo."
+    },
+    {
+      "id": "github_copilot",
+      "label": "GitHub Copilot",
+      "description": "Asistente de código de GitHub, basado en Codex."
+    }
+  ]
+}

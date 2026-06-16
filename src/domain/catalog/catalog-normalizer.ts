@@ -3,11 +3,19 @@ import type { CatalogBundle, CatalogIndex } from './catalog-types';
 export class CatalogNormalizer {
   static normalize(bundle: CatalogBundle): CatalogIndex {
     return {
+      artifactKindsById: new Map(Object.entries(bundle.artifactKinds ?? {})),
+      providersById: new Map(Object.entries(bundle.providers ?? {})),
       profilesById: new Map(Object.entries(bundle.profiles)),
       templatesById: new Map(Object.entries(bundle.templates)),
       templatesByProfileId: this.buildTemplatesByProfileId(bundle),
+      contextFieldsById: new Map(Object.entries(bundle.contextFields ?? {})),
       constraintsById: new Map(Object.entries(bundle.constraints)),
-      outputsById: new Map(Object.entries(bundle.outputs))
+      outputFormatsById: new Map(Object.entries(bundle.outputs)),
+      contextFieldRules: bundle.contextFieldRules,
+      constraintRules: bundle.constraintRules,
+      outputFormatRules: bundle.outputFormatRules,
+      providerCompatibility: bundle.compatibility,
+      providerEquivalents: bundle.providerEquivalents
     };
   }
 

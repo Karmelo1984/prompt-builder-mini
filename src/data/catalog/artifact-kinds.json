@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "prompt",
+      "label": "Prompt",
+      "description": "Instrucciones o preguntas para un modelo de IA para generar contenido específico."
+    },
+    {
+      "id": "skill",
+      "label": "Skill",
+      "description": "Herramienta o funcionalidad especializada registrable en Claude Code."
+    },
+    {
+      "id": "hook",
+      "label": "Hook",
+      "description": "Comando ejecutable en respuesta a eventos o triggers en Claude Code."
+    },
+    {
+      "id": "project_instructions",
+      "label": "Project Instructions",
+      "description": "Instrucciones globales para un proyecto (CLAUDE.md)."
+    },
+    {
+      "id": "scoped_instructions",
+      "label": "Scoped Instructions",
+      "description": "Instrucciones específicas para un directorio o contexto limitado."
+    },
+    {
+      "id": "prompt_file",
+      "label": "Prompt File",
+      "description": "Archivo de prompts para almacenar y versionar instrucciones."
+    },
+    {
+      "id": "agent_instructions",
+      "label": "Agent Instructions",
+      "description": "Instrucciones para un agente especializado o autónomo."
+    },
+    {
+      "id": "workflow",
+      "label": "Workflow",
+      "description": "Secuencia de pasos o tareas coordinadas."
+    },
+    {
+      "id": "checklist",
+      "label": "Checklist",
+      "description": "Lista de verificación para validar calidad o completitud."
+    }
+  ]
+}

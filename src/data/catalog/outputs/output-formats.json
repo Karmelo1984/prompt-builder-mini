@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "causa",
+      "label": "Causa",
+      "description": "Causa raíz en una línea."
+    },
+    {
+      "id": "cause",
+      "label": "Cause",
+      "description": "Causa probable o diagnóstico."
+    },
+    {
+      "id": "diff",
+      "label": "Diff",
+      "description": "Diff mínimo aplicable."
+    },
+    {
+      "id": "test",
+      "label": "Test",
+      "description": "Test mínimo o comando de verificación."
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "description": "Tests nuevos o modificados."
+    },
+    {
+      "id": "riesgos",
+      "label": "Riesgos",
+      "description": "Riesgos si el fix es incompleto."
+    },
+    {
+      "id": "risks",
+      "label": "Risks",
+      "description": "Riesgos, supuestos y efectos secundarios."
+    },
+    {
+      "id": "plan",
+      "label": "Plan",
+      "description": "Plan breve antes del código."
+    },
+    {
+      "id": "files",
+      "label": "Files",
+      "description": "Archivos a modificar."
+    },
+    {
+      "id": "commands",
+      "label": "Commands",
+      "description": "Comandos para verificar."
+    },
+    {
+      "id": "table",
+      "label": "Table",
+      "description": "Tabla de hallazgos."
+    },
+    {
+      "id": "severity",
+      "label": "Severity",
+      "description": "Severidad por problema: crítica, alta, media, baja."
+    },
+    {
+      "id": "fixes",
+      "label": "Fixes",
+      "description": "Fix recomendado por hallazgo."
+    },
+    {
+      "id": "cases",
+      "label": "Cases",
+      "description": "Casos de prueba esenciales."
+    },
+    {
+      "id": "testCode",
+      "label": "Test Code",
+      "description": "Código de tests."
+    },
+    {
+      "id": "mocks",
+      "label": "Mocks",
+      "description": "Mocks/stubs necesarios."
+    },
+    {
+      "id": "query",
+      "label": "Query",
+      "description": "Query optimizada."
+    },
+    {
+      "id": "indexes",
+      "label": "Indexes",
+      "description": "Índices recomendados, si aplican."
+    },
+    {
+      "id": "explain",
+      "label": "Explain",
+      "description": "Qué mirar en EXPLAIN/EXPLAIN ANALYZE."
+    },
+    {
+      "id": "summary",
+      "label": "Summary",
+      "description": "Resumen ejecutivo del flujo."
+    },
+    {
+      "id": "flow",
+      "label": "Flow",
+      "description": "Flujo paso a paso."
+    },
+    {
+      "id": "questions",
+      "label": "Questions",
+      "description": "Preguntas críticas pendientes."
+    },
+    {
+      "id": "mapping",
+      "label": "Mapping",
+      "description": "Mapa origen → destino de la migración."
+    },
+    {
+      "id": "regex",
+      "label": "Regex",
+      "description": "Regex final lista para copiar."
+    },
+    {
+      "id": "explanationShort",
+      "label": "Explanation",
+      "description": "Explicación corta de la regex."
+    },
+    {
+      "id": "examplesPassFail",
+      "label": "Examples",
+      "description": "Casos que deben pasar y fallar."
+    },
+    {
+      "id": "edgeCases",
+      "label": "Edge Cases",
+      "description": "Casos borde."
+    },
+    {
+      "id": "options",
+      "label": "Options",
+      "description": "Opciones comparadas."
+    },
+    {
+      "id": "tradeoffs",
+      "label": "Trade-offs",
+      "description": "Trade-offs claros."
+    },
+    {
+      "id": "decision",
+      "label": "Decision",
+      "description": "Recomendación final."
+    },
+    {
+      "id": "nextSteps",
+      "label": "Next Steps",
+      "description": "Siguientes pasos concretos."
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "noRefactor",
+      "label": "No refactor",
+      "description": "No refactorices código no relacionado."
+    },
+    {
+      "id": "noDeps",
+      "label": "No dependencias",
+      "description": "No añadas dependencias salvo que sea imprescindible y lo justifiques."
+    },
+    {
+      "id": "noApi",
+      "label": "No cambiar API",
+      "description": "No cambies la API pública ni contratos existentes sin avisar."
+    },
+    {
+      "id": "priorizarBloqueante",
+      "label": "Priorizar bloqueante",
+      "description": "Si hay varios problemas, prioriza el bloqueante primero."
+    },
+    {
+      "id": "backwardCompatibility",
+      "label": "Compatibilidad hacia atrás",
+      "description": "Mantén compatibilidad hacia atrás."
+    },
+    {
+      "id": "noStyleNitpicks",
+      "label": "No style nitpicks",
+      "description": "No comentes estilo menor salvo que oculte un bug."
+    },
+    {
+      "id": "markOpinions",
+      "label": "Marcar opiniones",
+      "description": "Si algo es opinión, márcalo como opinión."
+    },
+    {
+      "id": "noBigRewrite",
+      "label": "No big rewrite",
+      "description": "No propongas reescrituras grandes si existe un fix local."
+    },
+    {
+      "id": "sameBehavior",
+      "label": "Mismo comportamiento",
+      "description": "El comportamiento observable debe seguir siendo idéntico."
+    },
+    {
+      "id": "smallSteps",
+      "label": "Cambios pequeños",
+      "description": "Propón cambios pequeños, revisables y reversibles."
+    },
+    {
+      "id": "noFragileTests",
+      "label": "No tests frágiles",
+      "description": "No generes tests frágiles por tiempo, red, orden aleatorio o datos externos."
+    },
+    {
+      "id": "blackBox",
+      "label": "Black box",
+      "description": "Prioriza pruebas de comportamiento sobre implementación interna."
+    },
+    {
+      "id": "edgeCases",
+      "label": "Edge cases",
+      "description": "Incluye bordes: null, vacío, duplicados, errores externos y límites."
+    },
+    {
+      "id": "sameResult",
+      "label": "Mismo resultado",
+      "description": "No cambies el resultado lógico."
+    },
+    {
+      "id": "noSchemaChangeUnlessNeeded",
+      "label": "No schema change",
+      "description": "No propongas cambios de esquema salvo que sean claramente necesarios."
+    },
+    {
+      "id": "explainAssumptions",
+      "label": "Explicar supuestos",
+      "description": "Declara supuestos sobre volumen, índices o datos."
+    },
+    {
+      "id": "noChanges",
+      "label": "No cambios",
+      "description": "No modifiques código; solo explica y analiza."
+    },
+    {
+      "id": "noBasics",
+      "label": "No básicos",
+      "description": "No expliques conceptos básicos salvo que sean necesarios para el diagnóstico."
+    },
+    {
+      "id": "separateFacts",
+      "label": "Separar hechos",
+      "description": "Separa hechos observables, inferencias y dudas."
+    },
+    {
+      "id": "noOverengineering",
+      "label": "No over-engineering",
+      "description": "No sobrediseñes la solución."
+    },
+    {
+      "id": "specifyFlavor",
+      "label": "Especificar flavor",
+      "description": "Indica el flavor de regex asumido: JS, Python, PCRE, etc."
+    },
+    {
+      "id": "warnLimitations",
+      "label": "Advertir limitaciones",
+      "description": "Indica limitaciones y falsos positivos/falsos negativos previsibles."
+    },
+    {
+      "id": "noHype",
+      "label": "No hype",
+      "description": "Evita recomendaciones por moda; justifica por restricciones reales."
+    },
+    {
+      "id": "stateAssumptions",
+      "label": "Declarar supuestos",
+      "description": "Declara supuestos y datos que faltan."
+    },
+    {
+      "id": "preferSimple",
+      "label": "Preferir simple",
+      "description": "Prefiere la solución más simple que cumpla requisitos."
+    }
+  ]
+}

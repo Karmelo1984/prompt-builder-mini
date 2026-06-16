@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "tip-1",
+      "type": "tip",
+      "label": "Definir situación",
+      "content": "Define la situación antes de pegar código. Si el objetivo está mal, el prompt también."
+    },
+    {
+      "id": "tip-2",
+      "type": "tip",
+      "label": "Rol técnico concreto",
+      "content": "Usa rol técnico concreto: barato en tokens, útil para el enfoque."
+    },
+    {
+      "id": "tip-3",
+      "type": "tip",
+      "label": "Contexto verificable",
+      "content": "Pega solo contexto verificable: función, traceback, query, criterios o contrato afectado."
+    },
+    {
+      "id": "tip-4",
+      "type": "tip",
+      "label": "Restricciones explícitas",
+      "content": "Pon restricciones explícitas: no refactor, no nuevas dependencias, no cambiar API."
+    },
+    {
+      "id": "tip-5",
+      "type": "tip",
+      "label": "Salida exacta",
+      "content": "Pide salida exacta: causa, diff, test, comando y riesgos."
+    },
+    {
+      "id": "tip-6",
+      "type": "tip",
+      "label": "Conversación nueva",
+      "content": "Abre conversación nueva al cambiar de tarea para no pagar historial viejo."
+    },
+    {
+      "id": "tip-7",
+      "type": "tip",
+      "label": "Modo compacto vs XML",
+      "content": "Usa modo compacto para tareas simples; usa XML cuando haya contexto largo o varios bloques."
+    }
+  ]
+}

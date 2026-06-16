@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "items": [
+    {
+      "id": "product-owner",
+      "label": "Product Owner",
+      "description": "Enfocado en definición de requisitos, priorización y valor de negocio."
+    },
+    {
+      "id": "qa-manual",
+      "label": "QA Manual",
+      "description": "Especializado en casos de prueba, escenarios y validación manual."
+    },
+    {
+      "id": "qa-automation",
+      "label": "QA Automation",
+      "description": "Enfocado en tests automatizados, cobertura y confiabilidad."
+    },
+    {
+      "id": "developer",
+      "label": "Developer",
+      "description": "Senior developer enfocado en calidad, testing y mantenibilidad del código."
+    },
+    {
+      "id": "tech-lead",
+      "label": "Tech Lead / Architect",
+      "description": "Especializado en decisiones técnicas, arquitectura y deuda técnica."
+    },
+    {
+      "id": "product-designer",
+      "label": "Product Designer / UX",
+      "description": "Enfocado en experiencia de usuario, flujos y componentes."
+    },
+    {
+      "id": "data-analyst",
+      "label": "Data Analyst",
+      "description": "Especializado en métricas, análisis SQL y dashboards."
+    },
+    {
+      "id": "devops-sre",
+      "label": "DevOps / SRE",
+      "description": "Enfocado en incidentes, despliegues y confiabilidad de sistemas."
+    }
+  ]
+}

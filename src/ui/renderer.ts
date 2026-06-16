@@ -1,5 +1,4 @@
 import type { PromptBuilder } from '../services/PromptBuilder';
-import { profileCatalog, promptTemplateCatalog, constraintCatalog, outputCatalog, tips } from '../data/catalogs';
 import { appInfo } from '../config/app-info';
 
 const $ = (id: string): HTMLElement => {
@@ -15,9 +14,10 @@ export class Renderer {
 
   constructor(private builder: PromptBuilder) {}
 
-  renderProfiles(): void {
+  renderProfiles(profiles?: Record<string, { label: string; description: string }>): void {
     const profileGrid = $('profileGrid');
-    profileGrid.innerHTML = Object.entries(profileCatalog)
+    if (!profiles) return;
+    profileGrid.innerHTML = Object.entries(profiles)
       .map(
         ([key, item]) => `
     <button class="flow-card" type="button" data-profile="${key}">
@@ -29,16 +29,17 @@ export class Renderer {
       .join('');
   }
 
-  renderTemplates(): void {
+  renderTemplates(templates?: Record<string, { label: string; description: string; profileId: string }>): void {
     const templateGrid = $('templateGrid');
     if (!this.builder.getState().selectedProfile) {
       templateGrid.innerHTML = '<p class="muted">Selecciona primero un perfil para ver sus plantillas.</p>';
       return;
     }
+    if (!templates) return;
     const allowed = this.builder.getAllowedTemplates();
     templateGrid.innerHTML = allowed
-      .map(key => {
-        const item = promptTemplateCatalog[key];
+      .map((key: string) => {
+        const item = templates[key];
         return `
       <button class="type-card" type="button" data-template="${key}">
         <strong>${item.label}</strong>
@@ -60,9 +61,10 @@ export class Renderer {
       .join('');
   }
 
-  renderTips(): void {
+  renderTips(tips?: string[]): void {
     const tipsList = $('tipsList');
-    tipsList.innerHTML = tips.map(t => `<li>${t}</li>`).join('');
+    if (!tips) return;
+    tipsList.innerHTML = tips.map((t: string) => `<li>${t}</li>`).join('');
   }
 
   updateProfileBadge(): void {
@@ -151,11 +153,11 @@ export class Renderer {
     });
     const templateData = this.builder.getPromptTemplateData();
     if (!templateData) return;
-    (templateData.recommendedRestrictions ?? []).forEach(key => {
+    (templateData.recommendedRestrictions ?? []).forEach((key: string) => {
       const elem = document.querySelector(`#constraints label[data-key="${key}"]`);
       if (elem) elem.classList.add('recommended');
     });
-    (templateData.recommendedOutputs ?? []).forEach(key => {
+    (templateData.recommendedOutputs ?? []).forEach((key: string) => {
       const elem = document.querySelector(`#outputs label[data-key="${key}"]`);
       if (elem) elem.classList.add('recommended');
     });
