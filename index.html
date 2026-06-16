@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="app-header">
+  <header class="app-header" id="appHeader">
     <div>
-      <h1>AI Prompt & Workflow Builder</h1>
-      <p class="lead">En V1 se generan prompts optimizados para GPT, Claude y Claude Code sin mezclar decisiones, contexto, restricciones ni formato de salida.</p>
+      <h1 id="appTitle">AI Prompt & Workflow Builder</h1>
+      <p class="lead" id="appLead">Construye prompts, instrucciones y flujos reutilizables para trabajar mejor con ChatGPT, Claude, Claude Code y GitHub Copilot.</p>
     </div>
     <div class="header-actions">
       <button id="themeToggle" class="secondary" type="button">Modo claro</button>
@@ -18,182 +18,341 @@
     </div>
   </header>
 
-  <main class="app-shell">
-    <section class="panel wizard-panel" aria-label="Constructor guiado de prompt">
-      <aside class="stepper" aria-label="Navegación de pasos">
-        <button class="step-pill active" type="button" data-step="1">
-          <span>1</span>
-          <strong>Perfil de uso</strong>
-        </button>
-        <button class="step-pill" type="button" data-step="2">
-          <span>2</span>
-          <strong>Plantilla</strong>
-        </button>
-        <button class="step-pill" type="button" data-step="3">
-          <span>3</span>
-          <strong>Contexto mínimo</strong>
-        </button>
-        <button class="step-pill" type="button" data-step="4">
-          <span>4</span>
-          <strong>Restricciones</strong>
-        </button>
-        <button class="step-pill" type="button" data-step="5">
-          <span>5</span>
-          <strong>Salida requerida</strong>
-        </button>
-      </aside>
+  <main id="landingView" class="landing-view">
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Crea artefactos profesionales para IA</h1>
+        <p class="hero-subtitle">Estructura tu contexto, restricciones y formato de salida en un solo lugar. Sin mezclar decisiones ni formato.</p>
+        <button id="ctaBuilder" class="cta-button" type="button">Crear artefacto IA</button>
+      </div>
+    </section>
 
-      <div class="wizard-content">
-        <section class="step-screen active" data-screen="1">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">Paso 1</p>
-              <h2>¿Cuál es tu rol o perfil?</h2>
-            </div>
-            <span id="profileBadge" class="badge">Sin seleccionar</span>
+    <section class="value-proposition">
+      <h2>¿Por qué AI Prompt & Workflow Builder?</h2>
+      <div class="value-grid">
+        <div class="value-card">
+          <h3>Estructura clara</h3>
+          <p>Pasos guiados que evitan omisiones críticas: contexto, restricciones y salida esperada.</p>
+        </div>
+        <div class="value-card">
+          <h3>Reutilizable</h3>
+          <p>Descarga tus artefactos y úsalos una y otra vez en cualquier AI o proyecto.</p>
+        </div>
+        <div class="value-card">
+          <h3>Optimizado</h3>
+          <p>Genera artefactos que gastan menos tokens totales en IA conversacional.</p>
+        </div>
+        <div class="value-card">
+          <h3>Sin dependencias</h3>
+          <p>Aplicación web ligera, sin cookies ni tracking, solo TypeScript + Vite.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="artifact-types">
+      <h2>Artefactos que puedes crear</h2>
+      <div class="artifact-cards">
+        <div class="artifact-card available">
+          <span class="badge-status">Disponible</span>
+          <h3>Prompts</h3>
+          <p>Instrucciones optimizadas para GPT, Claude, Claude Code y GitHub Copilot</p>
+          <div class="artifact-examples">
+            <span>Debug/Traceback</span>
+            <span>Feature</span>
+            <span>Code Review</span>
+            <span>Tests</span>
+            <span>Refactor</span>
+            <span>Arquitectura</span>
           </div>
-
-          <p class="muted max-text">Elige un perfil o rol. Este paso inicial reinicia la plantilla, contexto, restricciones y salida que ya tengas marcadas.</p>
-
-          <div class="tip-box">
-            <h3>Regla de ahorro</h3>
-            <p>El objetivo no es escribir el prompt más corto, sino evitar varias rondas de correcciones. En conjunto, un prompt estructurado suele gastar menos tokens totales.</p>
+        </div>
+        <div class="artifact-card coming-soon">
+          <span class="badge-status coming">Próximamente</span>
+          <h3>Skills de Claude</h3>
+          <p>Acciones reutilizables que amplían las capacidades de Claude Code</p>
+          <div class="artifact-examples">
+            <span>Custom actions</span>
+            <span>Workflows</span>
           </div>
-
-          <div class="flow-map" aria-label="Seleccionar perfil de usuario">
-            <div class="flow-grid" id="profileGrid"></div>
-          </div>
-        </section>
-
-        <section class="step-screen" data-screen="2">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">Paso 2</p>
-              <h2>Plantilla</h2>
-            </div>
-            <span id="templateBadge" class="badge">Sin seleccionar</span>
-          </div>
-
-          <p class="muted max-text">Elige la plantilla exacta para tu caso de uso. Cambiarla borra el contexto escrito y las selecciones posteriores.</p>
-
-          <div id="templateGrid" class="type-grid" aria-label="Plantillas disponibles"></div>
-        </section>
-
-        <section class="step-screen" data-screen="3">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">Paso 3</p>
-              <h2>Rellena el contexto mínimo</h2>
-            </div>
-          </div>
-
-          <p class="muted max-text">Pega solo lo necesario: stack, objetivo, porqué y el input verificable. Si modificas este paso después de marcar restricciones o salida, esas selecciones se limpian.</p>
-
-          <form id="promptForm" class="form-grid">
-            <label>
-              Stack / lenguaje
-              <input id="stack" type="text" placeholder="Ej.: Python 3.11, FastAPI, PostgreSQL">
-            </label>
-            <label>
-              Rol técnico
-              <input id="role" type="text" placeholder="Ej.: senior backend developer especializado en APIs">
-            </label>
-            <label>
-              Proyecto / módulo
-              <input id="project" type="text" placeholder="Ej.: API interna de facturación, módulo invoices">
-            </label>
-            <label>
-              Objetivo concreto
-              <input id="objective" type="text" placeholder="Ej.: corregir el error sin cambiar contrato público">
-            </label>
-            <label class="wide">
-              Por qué importa
-              <textarea id="why" rows="2" placeholder="Ej.: hay release hoy y necesito un fix mínimo verificable"></textarea>
-            </label>
-            <label class="wide">
-              Código, error, logs, query o input relevante
-              <textarea id="inputData" rows="8" placeholder="Pega aquí solo lo necesario: función, traceback, query, criterios de aceptación..."></textarea>
-            </label>
-            <label class="wide">
-              Ejemplos de formato o salida deseada <span class="optional">opcional</span>
-              <textarea id="examples" rows="4" placeholder="Ej.: Causa: ... / Diff: - original + corregido / Test: ..."></textarea>
-            </label>
-          </form>
-        </section>
-
-        <section class="step-screen" data-screen="4">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">Paso 4</p>
-              <h2>Restricciones</h2>
-            </div>
-            <button id="applyRecommendedConstraints" class="secondary" type="button">Aplicar recomendadas</button>
-          </div>
-
-          <p class="muted max-text">Las restricciones impiden que la IA “ayude” reescribiendo medio proyecto cuando solo querías cambiar una bombilla.</p>
-
-          <div id="constraints" class="check-grid"></div>
-        </section>
-
-        <section class="step-screen" data-screen="5">
-          <div class="section-title">
-            <div>
-              <p class="eyebrow">Paso 5</p>
-              <h2>Salida requerida</h2>
-            </div>
-            <button id="applyRecommendedOutputs" class="secondary" type="button">Aplicar recomendadas</button>
-          </div>
-
-          <p class="muted max-text">Pide una salida concreta: causa, diff, tests y verificación. Lo contrario genera literatura técnica decorativa.</p>
-
-          <div id="outputs" class="check-grid"></div>
-        </section>
-
-        <div class="wizard-actions">
-          <button id="prevStep" class="secondary" type="button">Anterior</button>
-          <div class="wizard-actions-right">
-            <span id="resetNotice" class="reset-notice" aria-live="polite"></span>
-            <button id="nextStep" type="button">Siguiente</button>
+        </div>
+        <div class="artifact-card coming-soon">
+          <span class="badge-status coming">Próximamente</span>
+          <h3>Hooks & Workflows</h3>
+          <p>Automatizaciones para Claude Code y herramientas de desarrollo</p>
+          <div class="artifact-examples">
+            <span>Pre-commit hooks</span>
+            <span>Auto-workflows</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="panel output-panel" aria-label="Prompt generado">
-      <div class="section-title output-title">
-        <div>
-          <p class="eyebrow">Vista fija</p>
-          <h2>Prompt generado</h2>
+    <section class="provider-compatibility">
+      <h2>Compatible con</h2>
+      <div class="providers">
+        <div class="provider">
+          <strong>ChatGPT</strong>
+          <small>GPT-4, GPT-4o, o-1</small>
         </div>
-        <div class="stats">
-          <span id="charCount">0 chars</span>
-          <span id="tokenEstimate">~0 tokens</span>
-          <label class="switch">
-            <input id="compactMode" type="checkbox">
-            <span>Modo compacto</span>
-          </label>
+        <div class="provider">
+          <strong>Claude</strong>
+          <small>Sonnet, Opus, Haiku</small>
+        </div>
+        <div class="provider">
+          <strong>Claude Code</strong>
+          <small>IDE, CLI, Web</small>
+        </div>
+        <div class="provider">
+          <strong>GitHub Copilot</strong>
+          <small>VS Code, JetBrains</small>
         </div>
       </div>
+    </section>
 
-      <textarea id="generatedPrompt" class="generated" spellcheck="false" readonly></textarea>
-
-      <div class="button-row">
-        <button id="copyPrompt" type="button">Copiar prompt</button>
-        <button id="downloadPrompt" class="secondary" type="button">Descargar .txt</button>
-        <button id="copyHandoff" class="secondary" type="button">Prompt de handoff</button>
+    <section class="security-notes">
+      <h2>Privacidad y seguridad</h2>
+      <div class="security-content">
+        <div class="security-item">
+          <strong>Sin servidor</strong>
+          <p>Todo corre en tu navegador. Nada se guarda en servidor.</p>
+        </div>
+        <div class="security-item">
+          <strong>Sin tracking</strong>
+          <p>Cero cookies, cero analytics, cero recopilación de datos.</p>
+        </div>
+        <div class="security-item">
+          <strong>Código abierto</strong>
+          <p>Repositorio público en GitHub para transparencia total.</p>
+        </div>
       </div>
+    </section>
 
-      <section class="quality-box">
-        <h3>Checklist de calidad</h3>
-        <div id="qualityChecks" class="quality-checks"></div>
-      </section>
-
-      <section class="tips-panel">
-        <h3>Tips activos</h3>
-        <ul id="tipsList" class="tip-list"></ul>
-      </section>
+    <section class="cta-section">
+      <h2>¿Listo para construir mejores prompts?</h2>
+      <button id="ctaBuilderBottom" class="cta-button" type="button">Ir al builder</button>
     </section>
   </main>
+
+  <div id="builderView" class="builder-view" style="display: none;">
+    <div class="builder-header">
+      <button id="backToLanding" class="secondary" type="button">← Volver a inicio</button>
+    </div>
+    <main class="app-shell">
+      <section class="panel wizard-panel" aria-label="Constructor guiado de prompt">
+        <aside class="stepper" aria-label="Flujo guiado de construcción">
+          <button class="step-pill active" type="button" data-step="1" data-section="1">
+            <span>1</span>
+            <strong>Crear</strong>
+          </button>
+          <button class="step-pill" type="button" data-step="2" data-section="2">
+            <span>2</span>
+            <strong>Destino</strong>
+          </button>
+          <button class="step-pill" type="button" data-step="3" data-section="3">
+            <span>3</span>
+            <strong>Perfil</strong>
+          </button>
+          <button class="step-pill" type="button" data-step="4" data-section="4">
+            <span>4</span>
+            <strong>Plantilla</strong>
+          </button>
+          <button class="step-pill" type="button" data-step="5" data-section="5">
+            <span>5</span>
+            <strong>Información</strong>
+          </button>
+          <button class="step-pill" type="button" data-step="6" data-section="6">
+            <span>6</span>
+            <strong>Reglas</strong>
+          </button>
+          <button class="step-pill" type="button" data-step="7" data-section="7">
+            <span>7</span>
+            <strong>Formato</strong>
+          </button>
+        </aside>
+
+        <div class="wizard-content">
+          <section class="step-screen active" data-screen="1">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Crear</p>
+                <h2>¿Qué quieres crear?</h2>
+              </div>
+              <span id="artifactBadge" class="badge">Sin seleccionar</span>
+            </div>
+
+            <p class="muted max-text">Elige el tipo de artefacto que necesitas generar. Solo Prompts está disponible en V1.</p>
+
+            <div class="flow-map" aria-label="Seleccionar tipo de artefacto">
+              <div class="flow-grid" id="artifactGrid"></div>
+            </div>
+          </section>
+
+          <section class="step-screen" data-screen="2">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Destino</p>
+                <h2>¿Dónde lo vas a usar?</h2>
+              </div>
+              <span id="providerBadge" class="badge">Sin seleccionar</span>
+            </div>
+
+            <p class="muted max-text">Selecciona dónde usarás el artefacto. La compatibilidad depende del tipo que elegiste en el paso anterior.</p>
+
+            <div class="flow-map" aria-label="Seleccionar proveedor">
+              <div class="flow-grid" id="providerGrid"></div>
+            </div>
+          </section>
+
+          <section class="step-screen" data-screen="3">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Perfil</p>
+                <h2>¿Cuál es tu rol o perfil?</h2>
+              </div>
+              <span id="profileBadge" class="badge">Sin seleccionar</span>
+            </div>
+
+            <p class="muted max-text">Elige un perfil o rol. Cambiar esto reiniciará la plantilla, contexto, restricciones y salida que ya tengas marcadas.</p>
+
+            <div class="tip-box">
+              <h3>Regla de ahorro</h3>
+              <p>El objetivo no es escribir el prompt más corto, sino evitar varias rondas de correcciones. En conjunto, un prompt estructurado suele gastar menos tokens totales.</p>
+            </div>
+
+            <div class="flow-map" aria-label="Seleccionar perfil de usuario">
+              <div class="flow-grid" id="profileGrid"></div>
+            </div>
+          </section>
+
+          <section class="step-screen" data-screen="4">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Plantilla</p>
+                <h2>Plantilla</h2>
+              </div>
+              <span id="templateBadge" class="badge">Sin seleccionar</span>
+            </div>
+
+            <p class="muted max-text">Elige la plantilla exacta para tu caso de uso. Cambiarla borra el contexto escrito y las selecciones posteriores.</p>
+
+            <div id="templateGrid" class="type-grid" aria-label="Plantillas disponibles"></div>
+          </section>
+
+          <section class="step-screen" data-screen="5">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Información</p>
+                <h2>Rellena el contexto mínimo</h2>
+              </div>
+            </div>
+
+            <p class="muted max-text">Pega solo lo necesario: stack, objetivo, porqué y el input verificable. Si modificas esto después de marcar reglas o formato, esas selecciones se limpian.</p>
+
+            <form id="promptForm" class="form-grid">
+              <label>
+                Stack / lenguaje
+                <input id="stack" type="text" placeholder="Ej.: Python 3.11, FastAPI, PostgreSQL">
+              </label>
+              <label>
+                Rol técnico
+                <input id="role" type="text" placeholder="Ej.: senior backend developer especializado en APIs">
+              </label>
+              <label>
+                Proyecto / módulo
+                <input id="project" type="text" placeholder="Ej.: API interna de facturación, módulo invoices">
+              </label>
+              <label>
+                Objetivo concreto
+                <input id="objective" type="text" placeholder="Ej.: corregir el error sin cambiar contrato público">
+              </label>
+              <label class="wide">
+                Por qué importa
+                <textarea id="why" rows="2" placeholder="Ej.: hay release hoy y necesito un fix mínimo verificable"></textarea>
+              </label>
+              <label class="wide">
+                Código, error, logs, query o input relevante
+                <textarea id="inputData" rows="8" placeholder="Pega aquí solo lo necesario: función, traceback, query, criterios de aceptación..."></textarea>
+              </label>
+              <label class="wide">
+                Ejemplos de formato o salida deseada <span class="optional">opcional</span>
+                <textarea id="examples" rows="4" placeholder="Ej.: Causa: ... / Diff: - original + corregido / Test: ..."></textarea>
+              </label>
+            </form>
+          </section>
+
+          <section class="step-screen" data-screen="6">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Reglas</p>
+                <h2>Define tus restricciones</h2>
+              </div>
+              <button id="applyRecommendedConstraints" class="secondary" type="button">Aplicar recomendadas</button>
+            </div>
+
+            <p class="muted max-text">Define restricciones explícitas para que la IA no se desvíe. Ejemplo: "no reescribas el frontend, solo backend".</p>
+
+            <div id="constraints" class="check-grid"></div>
+          </section>
+
+          <section class="step-screen" data-screen="7">
+            <div class="section-title">
+              <div>
+                <p class="eyebrow">Formato</p>
+                <h2>Define el formato de salida</h2>
+              </div>
+              <button id="applyRecommendedOutputs" class="secondary" type="button">Aplicar recomendadas</button>
+            </div>
+
+            <p class="muted max-text">Define el formato de salida esperado: estructura, ejemplos, verificación. Sé específico para evitar literatura decorativa.</p>
+
+            <div id="outputs" class="check-grid"></div>
+          </section>
+
+          <div class="wizard-actions">
+            <button id="prevStep" class="secondary" type="button">Anterior</button>
+            <div class="wizard-actions-right">
+              <span id="resetNotice" class="reset-notice" aria-live="polite"></span>
+              <button id="nextStep" type="button">Siguiente</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel output-panel" aria-label="Prompt generado">
+        <div class="section-title output-title">
+          <div>
+            <p class="eyebrow">Vista fija</p>
+            <h2>Prompt generado</h2>
+          </div>
+          <div class="stats">
+            <span id="charCount">0 chars</span>
+            <span id="tokenEstimate">~0 tokens</span>
+            <label class="switch">
+              <input id="compactMode" type="checkbox">
+              <span>Modo compacto</span>
+            </label>
+          </div>
+        </div>
+
+        <textarea id="generatedPrompt" class="generated" spellcheck="false" readonly></textarea>
+
+        <div class="button-row">
+          <button id="copyPrompt" type="button">Copiar prompt</button>
+          <button id="downloadPrompt" class="secondary" type="button">Descargar .txt</button>
+          <button id="copyHandoff" class="secondary" type="button">Prompt de handoff</button>
+        </div>
+
+        <section class="quality-box">
+          <h3>Checklist de calidad</h3>
+          <div id="qualityChecks" class="quality-checks"></div>
+        </section>
+
+        <section class="tips-panel">
+          <h3>Tips activos</h3>
+          <ul id="tipsList" class="tip-list"></ul>
+        </section>
+      </section>
+    </main>
+  </div>
 
   <footer class="footer">
     <div class="footer-content">

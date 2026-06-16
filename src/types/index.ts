@@ -4,12 +4,16 @@ export type { ProfileItem, PromptTemplateItem };
 
 export interface AppState {
   currentStep: number;
+  selectedArtifact: string | null;
+  selectedProvider: string | null;
   selectedProfile: string | null;
   selectedTemplate: string | null;
   contextTouched: boolean;
 }
 
 export interface PromptData {
+  artifact: string;
+  provider: string;
   profile: string;
   template: string;
   role: string;

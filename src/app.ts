@@ -14,12 +14,60 @@ const optionsRepository = new LocalBuilderOptionsRepository(catalogIndex);
 
 const fields = ['stack', 'role', 'project', 'objective', 'why', 'inputData', 'examples'];
 
+function goToBuilder(): void {
+  const landingView = document.getElementById('landingView');
+  const builderView = document.getElementById('builderView');
+  const appHeader = document.getElementById('appHeader');
+  const appTitle = document.getElementById('appTitle');
+  const appLead = document.getElementById('appLead');
+
+  if (landingView) landingView.style.display = 'none';
+  if (builderView) builderView.style.display = 'flex';
+  if (appTitle) appTitle.textContent = 'AI Prompt & Workflow Builder';
+  if (appLead) appLead.textContent = 'En V1 se generan prompts optimizados para GPT, Claude y Claude Code sin mezclar decisiones, contexto, restricciones ni formato de salida.';
+}
+
+function goToLanding(): void {
+  const landingView = document.getElementById('landingView');
+  const builderView = document.getElementById('builderView');
+  const appTitle = document.getElementById('appTitle');
+  const appLead = document.getElementById('appLead');
+
+  if (landingView) landingView.style.display = 'block';
+  if (builderView) builderView.style.display = 'none';
+  if (appTitle) appTitle.textContent = 'AI Prompt & Workflow Builder';
+  if (appLead) appLead.textContent = 'Construye prompts, instrucciones y flujos reutilizables para trabajar mejor con ChatGPT, Claude, Claude Code y GitHub Copilot.';
+}
+
+function bindNavigationEvents(): void {
+  const ctaBuilder = document.getElementById('ctaBuilder');
+  const ctaBuilderBottom = document.getElementById('ctaBuilderBottom');
+  const backToLanding = document.getElementById('backToLanding');
+
+  if (ctaBuilder) ctaBuilder.addEventListener('click', goToBuilder);
+  if (ctaBuilderBottom) ctaBuilderBottom.addEventListener('click', goToBuilder);
+  if (backToLanding) backToLanding.addEventListener('click', goToLanding);
+}
+
 function init(): void {
   const catalogValidation = CatalogRepository.getValidation();
   if (catalogValidation.errors.length > 0) {
     console.error('[CatalogValidator]', catalogValidation.errors);
   }
+
+  bindNavigationEvents();
+
   const screenModel = buildBuilderScreenModel(builder.getState(), catalogIndex, optionsRepository);
+  const artifactKinds = bundle.artifactKinds || {};
+  const providers = bundle.providers || {};
+  const compatibility = (bundle.compatibility as Record<string, string[]>) || {};
+
+  renderer.setCompatibility(compatibility);
+  renderer.setProviders(providers);
+  renderer.setArtifactKinds(artifactKinds);
+  renderer.setTemplates(screenModel.catalogs.templates);
+  renderer.renderArtifacts(artifactKinds);
+  renderer.renderProviders(providers, compatibility);
   renderer.renderProfiles(screenModel.catalogs.profiles);
   renderer.renderTemplates(screenModel.catalogs.templates);
   renderer.renderChecks('constraints', screenModel.catalogs.constraints);
@@ -36,6 +84,8 @@ function updatePrompt(): void {
   const templateData = builder.getPromptTemplateData();
   const compact = renderer.isCompactMode();
 
+  const artifact = state.selectedArtifact || 'prompt';
+  const provider = state.selectedProvider || 'claude';
   const profile = builder.getProfileLabel();
   const template = builder.getTemplateLabel();
   const role = renderer.getFlagValue('role') || templateData?.role || '[rol técnico concreto]';
@@ -52,6 +102,8 @@ function updatePrompt(): void {
     templateData?.question || '¿Cuál es la respuesta correcta con el mínimo contexto necesario y cómo la verifico?';
 
   const data: PromptData = {
+    artifact,
+    provider,
     profile,
     template,
     role,

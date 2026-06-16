@@ -164,6 +164,8 @@ export class PromptExporter implements ArtifactExporter {
 
   private parsePromptData(content: string): PromptData {
     return {
+      artifact: '',
+      provider: '',
       profile: '',
       template: '',
       role: '',

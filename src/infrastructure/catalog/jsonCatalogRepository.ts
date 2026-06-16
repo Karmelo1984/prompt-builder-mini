@@ -1,4 +1,4 @@
-import type { CatalogBundle, ProfileItem, PromptTemplateItem } from '../../domain/catalog/catalog-types';
+import type { CatalogBundle, ProfileItem, PromptTemplateItem, ArtifactKindItem, ProviderItem } from '../../domain/catalog/catalog-types';
 import profilesData from '../../data/catalog/profiles.json';
 import templatesData from '../../data/catalog/templates/prompt-templates.json';
 import constraintsData from '../../data/catalog/definitions/constraints.json';
@@ -82,7 +82,57 @@ export class JsonCatalogRepository {
       }
     });
 
+    const artifactKindsMap: Record<string, ArtifactKindItem> = {
+      prompt: {
+        id: 'prompt',
+        label: 'Prompt',
+        description: 'Instrucciones optimizadas para IA'
+      },
+      skill: {
+        id: 'skill',
+        label: 'Skill de Claude',
+        description: 'Acción reutilizable (próximamente)'
+      },
+      hook: {
+        id: 'hook',
+        label: 'Hook/Workflow',
+        description: 'Automatización para herramientas (próximamente)'
+      }
+    };
+
+    const providersMap: Record<string, ProviderItem> = {
+      chatgpt: {
+        id: 'chatgpt',
+        label: 'ChatGPT',
+        description: 'GPT-4, GPT-4o, o-1'
+      },
+      claude: {
+        id: 'claude',
+        label: 'Claude',
+        description: 'Sonnet, Opus, Haiku'
+      },
+      claude_code: {
+        id: 'claude_code',
+        label: 'Claude Code',
+        description: 'IDE, CLI, Web'
+      },
+      github_copilot: {
+        id: 'github_copilot',
+        label: 'GitHub Copilot',
+        description: 'VS Code, JetBrains'
+      }
+    };
+
+    const compatibilityMap: Record<string, string[]> = {
+      prompt: ['chatgpt', 'claude', 'claude_code', 'github_copilot'],
+      skill: ['claude'],
+      hook: ['claude']
+    };
+
     return {
+      artifactKinds: artifactKindsMap,
+      providers: providersMap,
+      compatibility: compatibilityMap,
       profiles: profilesMap,
       templates: templatesMap,
       constraints: constraintsMap,

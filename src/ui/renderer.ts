@@ -9,41 +9,191 @@ const $ = (id: string): HTMLElement => {
   return element;
 };
 
+type FlowState = 'pending' | 'current' | 'completed' | 'locked';
+
+interface FlowSection {
+  id: number;
+  title: string;
+  state: FlowState;
+  isAccessible: boolean;
+}
+
 export class Renderer {
   private resetNoticeTimer: number | null = null;
+  private compatibility: Record<string, string[]> = {};
+  private providers: Record<string, { id: string; label: string; description?: string }> = {};
+  private artifactKinds: Record<string, { id: string; label: string; description: string }> = {};
+  private templates: Record<string, { label: string; description: string; profileId: string }> = {};
 
   constructor(private builder: PromptBuilder) {}
+
+  setCompatibility(compatibility: Record<string, string[]>): void {
+    this.compatibility = compatibility;
+  }
+
+  setProviders(providers: Record<string, { id: string; label: string; description?: string }>): void {
+    this.providers = providers;
+  }
+
+  setArtifactKinds(artifactKinds: Record<string, { id: string; label: string; description: string }>): void {
+    this.artifactKinds = artifactKinds;
+  }
+
+  setTemplates(templates: Record<string, { label: string; description: string; profileId: string }>): void {
+    this.templates = templates;
+  }
+
+  private getFlowSectionState(sectionId: number): FlowState {
+    const state = this.builder.getState();
+    const currentStep = state.currentStep;
+
+    if (sectionId === currentStep) return 'current';
+    if (sectionId < currentStep) {
+      if (this.isStepCompleteForRender(sectionId)) return 'completed';
+      return 'pending';
+    }
+    if (sectionId > currentStep) {
+      if (this.isStepAccessible(sectionId)) return 'pending';
+      return 'locked';
+    }
+    return 'pending';
+  }
+
+  private isStepAccessible(step: number): boolean {
+    const state = this.builder.getState();
+    if (step <= state.currentStep) return true;
+
+    // Un paso es accesible si todos los anteriores están completos
+    for (let i = 1; i < step; i++) {
+      if (!this.isStepCompleteForRender(i)) return false;
+    }
+    return true;
+  }
+
+  updateFlowState(): void {
+    const state = this.builder.getState();
+    document.querySelectorAll('[data-section]').forEach(section => {
+      const sectionId = Number((section as HTMLElement).dataset.section);
+      const flowState = this.getFlowSectionState(sectionId);
+
+      section.classList.remove('pending', 'current', 'completed', 'locked');
+      section.classList.add(flowState);
+
+      if (flowState === 'current') {
+        section.setAttribute('aria-current', 'step');
+      } else {
+        section.removeAttribute('aria-current');
+      }
+
+      if (flowState === 'locked') {
+        (section as HTMLButtonElement).disabled = true;
+      } else {
+        (section as HTMLButtonElement).disabled = false;
+      }
+    });
+  }
+
+  canNavigateTo(step: number): boolean {
+    if (step < 1 || step > 7) return false;
+    return this.isStepAccessible(step);
+  }
+
+  renderArtifacts(artifacts?: Record<string, { id: string; label: string; description: string }>): void {
+    const artifactGrid = $('artifactGrid');
+    if (!artifacts) return;
+    const selected = this.builder.getState().selectedArtifact;
+    artifactGrid.innerHTML = Object.entries(artifacts)
+      .map(
+        ([key, item]) => {
+          const isDisabled = key !== 'prompt';
+          const isSelected = key === selected;
+          return `
+    <button class="flow-card selection-card ${isDisabled ? 'disabled' : ''} ${isSelected ? 'selected' : ''}" type="button" data-artifact="${key}" ${isDisabled ? 'disabled' : ''} role="option" aria-selected="${isSelected}">
+      <strong>${item.label}</strong>
+      <small>${item.description}</small>
+      ${isSelected ? '<span class="selection-indicator">✓</span>' : ''}
+    </button>
+  `;
+        }
+      )
+      .join('');
+  }
+
+  renderProviders(providers?: Record<string, { id: string; label: string; description?: string }>, compatibility?: Record<string, string[]>): void {
+    const providerGrid = $('providerGrid');
+    const providersToUse = providers || this.providers;
+    if (!providersToUse) {
+      return;
+    }
+    const state = this.builder.getState();
+    const selectedArtifact = state.selectedArtifact;
+    const selectedProvider = state.selectedProvider;
+    const compatMap = compatibility || this.compatibility;
+
+
+    // Mostrar todos los proveedores, pero marcar como disabled solo si hay un artefacto seleccionado
+    // y no es compatible. Si no hay artefacto seleccionado, mostrar todo habilitado para seleccionar.
+    const allowedProviders = selectedArtifact ? (compatMap[selectedArtifact] || []) : Object.keys(providersToUse);
+
+    const html = Object.entries(providersToUse)
+      .map(
+        ([key, item]) => {
+          const isAllowed = allowedProviders.includes(key);
+          const isDisabled = !isAllowed;
+          const isSelected = key === selectedProvider;
+          return `
+    <button class="flow-card selection-card ${isDisabled ? 'disabled' : ''} ${isSelected ? 'selected' : ''}" type="button" data-provider="${key}" ${isDisabled ? 'disabled' : ''} role="option" aria-selected="${isSelected}">
+      <strong>${item.label}</strong>
+      <small>${item.description || ''}</small>
+      ${isSelected ? '<span class="selection-indicator">✓</span>' : ''}
+    </button>
+  `;
+        }
+      )
+      .join('');
+
+    providerGrid.innerHTML = html;
+  }
 
   renderProfiles(profiles?: Record<string, { label: string; description: string }>): void {
     const profileGrid = $('profileGrid');
     if (!profiles) return;
+    const selected = this.builder.getState().selectedProfile;
     profileGrid.innerHTML = Object.entries(profiles)
       .map(
-        ([key, item]) => `
-    <button class="flow-card" type="button" data-profile="${key}">
+        ([key, item]) => {
+          const isSelected = key === selected;
+          return `
+    <button class="flow-card selection-card ${isSelected ? 'selected' : ''}" type="button" data-profile="${key}" role="option" aria-selected="${isSelected}">
       <strong>${item.label}</strong>
       <small>${item.description}</small>
+      ${isSelected ? '<span class="selection-indicator">✓</span>' : ''}
     </button>
-  `
+  `;
+        }
       )
       .join('');
   }
 
   renderTemplates(templates?: Record<string, { label: string; description: string; profileId: string }>): void {
     const templateGrid = $('templateGrid');
+    const selected = this.builder.getState().selectedTemplate;
     if (!this.builder.getState().selectedProfile) {
       templateGrid.innerHTML = '<p class="muted">Selecciona primero un perfil para ver sus plantillas.</p>';
       return;
     }
-    if (!templates) return;
+    const templatesToUse = templates || this.templates;
+    if (!templatesToUse) return;
     const allowed = this.builder.getAllowedTemplates();
     templateGrid.innerHTML = allowed
       .map((key: string) => {
-        const item = templates[key];
+        const item = templatesToUse[key];
+        const isSelected = key === selected;
         return `
-      <button class="type-card" type="button" data-template="${key}">
+      <button class="type-card selection-card ${isSelected ? 'selected' : ''}" type="button" data-template="${key}" role="option" aria-selected="${isSelected}">
         <strong>${item.label}</strong>
         <small>${item.description}</small>
+        ${isSelected ? '<span class="selection-indicator">✓</span>' : ''}
       </button>
     `;
       })
@@ -67,6 +217,26 @@ export class Renderer {
     tipsList.innerHTML = tips.map((t: string) => `<li>${t}</li>`).join('');
   }
 
+  updateArtifactBadge(): void {
+    const state = this.builder.getState();
+    const label = state.selectedArtifact === 'prompt' ? 'Prompt' :
+                  state.selectedArtifact === 'skill' ? 'Skill' :
+                  state.selectedArtifact === 'hook' ? 'Hook' : 'Sin seleccionar';
+    ($('artifactBadge') as HTMLElement).textContent = label;
+  }
+
+  updateProviderBadge(): void {
+    const state = this.builder.getState();
+    const providers: Record<string, string> = {
+      chatgpt: 'ChatGPT',
+      claude: 'Claude',
+      claude_code: 'Claude Code',
+      github_copilot: 'GitHub Copilot'
+    };
+    const label = state.selectedProvider ? providers[state.selectedProvider] || 'Sin seleccionar' : 'Sin seleccionar';
+    ($('providerBadge') as HTMLElement).textContent = label;
+  }
+
   updateProfileBadge(): void {
     ($('profileBadge') as HTMLElement).textContent = this.builder.getProfileLabel();
   }
@@ -86,7 +256,8 @@ export class Renderer {
       pill.classList.toggle('completed', value < step && this.isStepCompleteForRender(value));
     });
     ($('prevStep') as HTMLButtonElement).disabled = step === 1;
-    ($('nextStep') as HTMLButtonElement).disabled = step === 5;
+    ($('nextStep') as HTMLButtonElement).disabled = step === 7;
+    this.updateFlowState();
   }
 
   private isStepCompleteForRender(step: number): boolean {
@@ -94,11 +265,14 @@ export class Renderer {
     const getChecked = (containerId: string): string[] =>
       [...document.querySelectorAll(`#${containerId} input:checked`)].map(i => (i as HTMLInputElement).value);
 
-    if (step === 1) return Boolean(this.builder.getState().selectedProfile);
-    if (step === 2) return Boolean(this.builder.getState().selectedTemplate);
-    if (step === 3) return Boolean(val('role') && val('objective'));
-    if (step === 4) return getChecked('constraints').length > 0;
-    if (step === 5) return getChecked('outputs').length > 0;
+    const state = this.builder.getState();
+    if (step === 1) return Boolean(state.selectedArtifact);
+    if (step === 2) return Boolean(state.selectedProvider);
+    if (step === 3) return Boolean(state.selectedProfile);
+    if (step === 4) return Boolean(state.selectedTemplate);
+    if (step === 5) return Boolean(val('role') && val('objective'));
+    if (step === 6) return getChecked('constraints').length > 0;
+    if (step === 7) return getChecked('outputs').length > 0;
     return false;
   }
 

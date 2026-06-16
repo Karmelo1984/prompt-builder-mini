@@ -10,6 +10,8 @@ export class PromptBuilder {
   constructor() {
     this.state = {
       currentStep: 1,
+      selectedArtifact: null,
+      selectedProvider: null,
       selectedProfile: null,
       selectedTemplate: null,
       contextTouched: false
@@ -21,10 +23,24 @@ export class PromptBuilder {
     return { ...this.state };
   }
 
+  selectArtifact(artifactId: string): void {
+    if (this.state.selectedArtifact !== artifactId) {
+      this.state.selectedArtifact = artifactId;
+      this.resetAfter(1);
+    }
+  }
+
+  selectProvider(providerId: string): void {
+    if (this.state.selectedProvider !== providerId) {
+      this.state.selectedProvider = providerId;
+      this.resetAfter(2);
+    }
+  }
+
   selectProfile(profileId: string): void {
     if (this.state.selectedProfile !== profileId) {
       this.state.selectedProfile = profileId;
-      this.resetAfter(1);
+      this.resetAfter(3);
     }
   }
 
@@ -35,7 +51,7 @@ export class PromptBuilder {
   }
 
   setCurrentStep(step: number): void {
-    this.state.currentStep = Math.max(1, Math.min(5, step));
+    this.state.currentStep = Math.max(1, Math.min(8, step));
   }
 
   nextStep(): void {
@@ -52,7 +68,18 @@ export class PromptBuilder {
 
   resetAfter(step: number): void {
     if (step < 2) {
+      this.state.selectedProvider = null;
+      this.state.selectedProfile = null;
       this.state.selectedTemplate = null;
+      this.state.contextTouched = false;
+    } else if (step < 3) {
+      this.state.selectedProfile = null;
+      this.state.selectedTemplate = null;
+      this.state.contextTouched = false;
+    } else if (step < 4) {
+      this.state.selectedTemplate = null;
+      this.state.contextTouched = false;
+    } else if (step < 5) {
       this.state.contextTouched = false;
     }
   }
@@ -64,6 +91,8 @@ export class PromptBuilder {
   reset(): void {
     this.state = {
       currentStep: 1,
+      selectedArtifact: null,
+      selectedProvider: null,
       selectedProfile: null,
       selectedTemplate: null,
       contextTouched: false
@@ -82,6 +111,8 @@ export class PromptBuilder {
     const state = this.getState();
     const contextMinimal = Boolean(data.stack || data.why);
     return [
+      ['Artefacto seleccionado', Boolean(state.selectedArtifact)],
+      ['Proveedor seleccionado', Boolean(state.selectedProvider)],
       ['Perfil seleccionado', Boolean(state.selectedProfile)],
       ['Plantilla seleccionada', Boolean(state.selectedTemplate)],
       ['Rol técnico/de negocio', Boolean(data.role && !data.role.includes('['))],

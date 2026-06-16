@@ -34,6 +34,37 @@ function resetCascade(
 }
 
 export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: string[], updatePrompt: () => void): void {
+  // Artefacto y proveedor
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    const artifactButton = target.closest('[data-artifact]') as HTMLElement | null;
+    if (artifactButton) {
+      const artifactId = artifactButton.dataset.artifact!;
+      builder.selectArtifact(artifactId);
+      document.querySelectorAll('[data-artifact]').forEach(el => el.classList.remove('active'));
+      artifactButton.classList.add('active');
+      renderer.renderProviders();
+      renderer.updateArtifactBadge();
+      builder.setCurrentStep(2);
+      renderer.goToStep(2);
+      updatePrompt();
+      return;
+    }
+
+    const providerButton = target.closest('[data-provider]') as HTMLElement | null;
+    if (providerButton) {
+      const providerId = providerButton.dataset.provider!;
+      builder.selectProvider(providerId);
+      document.querySelectorAll('[data-provider]').forEach(el => el.classList.remove('active'));
+      providerButton.classList.add('active');
+      renderer.updateProviderBadge();
+      builder.setCurrentStep(3);
+      renderer.goToStep(3);
+      updatePrompt();
+      return;
+    }
+  });
+
   // Perfil y plantilla
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement;
@@ -50,8 +81,8 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
       renderer.renderTemplates();
       renderer.updateProfileBadge();
       renderer.markRecommended();
-      builder.setCurrentStep(2);
-      renderer.goToStep(2);
+      builder.setCurrentStep(4);
+      renderer.goToStep(4);
       updatePrompt();
       return;
     }
@@ -72,8 +103,8 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
       }
       renderer.updateTemplateBadge();
       renderer.markRecommended();
-      builder.setCurrentStep(3);
-      renderer.goToStep(3);
+      builder.setCurrentStep(5);
+      renderer.goToStep(5);
       updatePrompt();
       return;
     }
@@ -133,24 +164,41 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
     updatePrompt();
   });
 
+  // Navegación a través de step-pills
+  document.querySelectorAll('.step-pill').forEach(pill => {
+    (pill as HTMLElement).addEventListener('click', (event) => {
+      const target = event.currentTarget as HTMLElement;
+      const stepStr = target.getAttribute('data-step');
+      if (!stepStr) return;
+      const step = parseInt(stepStr, 10);
+
+      if (renderer.canNavigateTo(step)) {
+        builder.setCurrentStep(step);
+        renderer.goToStep(step);
+        updatePrompt();
+      }
+    });
+  });
+
   // Navegación de pasos
   ($('prevStep') as HTMLElement).addEventListener('click', () => {
     const fromStep = builder.getState().currentStep;
     if (fromStep === 2) {
-      builder.reset();
+      document.querySelectorAll('[data-artifact]').forEach(el => el.classList.remove('active'));
+      renderer.updateArtifactBadge();
+      renderer.renderProviders();
+    } else if (fromStep === 3) {
+      document.querySelectorAll('[data-provider]').forEach(el => el.classList.remove('active'));
+      renderer.updateProviderBadge();
       document.querySelectorAll('[data-profile]').forEach(el => el.classList.remove('active'));
-      renderer.clearFlagValues(fields);
+      renderer.renderTemplates();
       renderer.clearChecks('constraints');
       renderer.clearChecks('outputs');
-      renderer.updateProfileBadge();
-      renderer.updateTemplateBadge();
-      renderer.renderTemplates();
-      renderer.markRecommended();
-    } else if (fromStep === 3) {
-      resetCascade('template', builder, renderer, fields);
     } else if (fromStep === 4) {
-      resetCascade('context', builder, renderer, fields);
+      resetCascade('template', builder, renderer, fields);
     } else if (fromStep === 5) {
+      resetCascade('context', builder, renderer, fields);
+    } else if (fromStep === 6) {
       resetCascade('restrictions', builder, renderer, fields);
     }
     builder.prevStep();
@@ -159,8 +207,11 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
   });
 
   ($('nextStep') as HTMLElement).addEventListener('click', () => {
-    builder.nextStep();
-    renderer.goToStep(builder.getState().currentStep);
+    const nextStep = builder.getState().currentStep + 1;
+    if (renderer.canNavigateTo(nextStep)) {
+      builder.nextStep();
+      renderer.goToStep(builder.getState().currentStep);
+    }
   });
 
   // Acciones del prompt
@@ -197,9 +248,11 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
     ($('compactMode') as HTMLInputElement).checked = false;
     renderer.clearChecks('constraints');
     renderer.clearChecks('outputs');
+    renderer.updateArtifactBadge();
+    renderer.updateProviderBadge();
     renderer.updateProfileBadge();
     renderer.updateTemplateBadge();
-    document.querySelectorAll('[data-profile], [data-template]').forEach(el => {
+    document.querySelectorAll('[data-artifact], [data-provider], [data-profile], [data-template]').forEach(el => {
       el.classList.remove('active');
     });
     renderer.renderTemplates();
