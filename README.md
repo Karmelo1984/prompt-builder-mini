@@ -1,6 +1,6 @@
-# Prompt Builder · Programación IA
+# AI Prompt & Workflow Builder · Programación IA
 
-Wizard interactivo de 5 pasos para construir prompts optimizados para GPT, Claude y Claude Code.
+Wizard interactivo de 5 pasos para construir prompts optimizados para GPT, Claude y Claude Code. En V1 se generan prompts; futuras versiones incluirán skills, hooks e instrucciones.
 
 ## Inicio rápido
 
