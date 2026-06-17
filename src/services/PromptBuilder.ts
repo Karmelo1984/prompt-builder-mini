@@ -1,4 +1,4 @@
-import type { AppState, PromptData } from '../types/index';
+import type { AppState, PromptData, BuilderMode } from '../types/index';
 import { PromptExporter } from '../domain/exporters/PromptExporter';
 // TEMPORARY: para métodos legacy que deben venir de BuilderScreenModel (próximas issues)
 import { promptTemplateCatalog } from '../data/catalogs';
@@ -7,14 +7,16 @@ export class PromptBuilder {
   private state: AppState;
   private promptExporter: PromptExporter;
 
-  constructor() {
+  constructor(mode: BuilderMode = 'advanced') {
     this.state = {
       currentStep: 1,
       selectedArtifact: null,
       selectedProvider: null,
       selectedProfile: null,
       selectedTemplate: null,
-      contextTouched: false
+      contextTouched: false,
+      mode,
+      reviewRequired: {}
     };
     this.promptExporter = new PromptExporter();
   }
@@ -89,13 +91,16 @@ export class PromptBuilder {
   }
 
   reset(): void {
+    const mode = this.state.mode;
     this.state = {
       currentStep: 1,
       selectedArtifact: null,
       selectedProvider: null,
       selectedProfile: null,
       selectedTemplate: null,
-      contextTouched: false
+      contextTouched: false,
+      mode,
+      reviewRequired: {}
     };
   }
 
@@ -117,10 +122,10 @@ export class PromptBuilder {
       ['Plantilla seleccionada', Boolean(state.selectedTemplate)],
       ['Rol técnico/de negocio', Boolean(data.role && !data.role.includes('['))],
       ['Objetivo concreto', Boolean(data.objective && !data.objective.includes('['))],
-      ['Contexto mínimo', contextMinimal],
+      ['Información necesaria', contextMinimal],
       ['Input verificable', Boolean(data.inputData)],
       ['Restricciones', data.constraints.length > 0],
-      ['Formato de salida', data.outputs.length > 0]
+      ['Formato de respuesta', data.outputs.length > 0]
     ];
   }
 

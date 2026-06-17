@@ -595,6 +595,25 @@ code {
   padding: 2px 6px;
 }
 
+#constraints.review-required,
+#outputs.review-required {
+  background: rgba(255, 193, 7, 0.05);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  position: relative;
+}
+
+#constraints.review-required::before,
+#outputs.review-required::before {
+  content: '⚠️ Requiere revisión';
+  display: block;
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
 @media (max-width: 1180px) {
   .app-shell { grid-template-columns: 1fr; }
   .output-panel { position: static; max-height: none; }
@@ -650,6 +669,14 @@ code {
   line-height: 1.6;
 }
 
+.mode-selector {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
 .cta-button {
   display: inline-block;
   padding: 14px 32px;
@@ -663,9 +690,19 @@ code {
   transition: transform .15s ease, box-shadow .15s ease;
 }
 
+.cta-button.secondary {
+  background: var(--bg-secondary);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
 .cta-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(125, 211, 252, .25);
+}
+
+.cta-button.secondary:hover {
+  box-shadow: 0 8px 24px rgba(125, 211, 252, .15);
 }
 
 /* Value proposition section */

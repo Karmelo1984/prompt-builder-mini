@@ -23,7 +23,10 @@
       <div class="hero-content">
         <h1>Crea artefactos profesionales para IA</h1>
         <p class="hero-subtitle">Estructura tu contexto, restricciones y formato de salida en un solo lugar. Sin mezclar decisiones ni formato.</p>
-        <button id="ctaBuilder" class="cta-button" type="button">Crear artefacto IA</button>
+        <div class="mode-selector">
+          <button id="ctaQuickMode" class="cta-button secondary" type="button">Modo rápido</button>
+          <button id="ctaAdvancedMode" class="cta-button" type="button">Modo avanzado</button>
+        </div>
       </div>
     </section>
 
@@ -128,7 +131,10 @@
 
     <section class="cta-section">
       <h2>¿Listo para construir mejores prompts?</h2>
-      <button id="ctaBuilderBottom" class="cta-button" type="button">Ir al builder</button>
+      <div class="mode-selector">
+        <button id="ctaQuickModeBottom" class="cta-button secondary" type="button">Modo rápido</button>
+        <button id="ctaAdvancedModeBottom" class="cta-button" type="button">Modo avanzado</button>
+      </div>
     </section>
   </main>
 
@@ -241,7 +247,7 @@
             <div class="section-title">
               <div>
                 <p class="eyebrow">Información</p>
-                <h2>Rellena el contexto mínimo</h2>
+                <h2>Rellena la información necesaria</h2>
               </div>
             </div>
 
@@ -268,7 +274,8 @@
                 Por qué importa
                 <textarea id="why" rows="2" placeholder="Ej.: hay release hoy y necesito un fix mínimo verificable"></textarea>
               </label>
-              <label class="wide">
+              <div id="contextFieldsContainer" style="display: contents;"></div>
+              <label class="wide" id="inputDataLabel" style="display: none;">
                 Código, error, logs, query o input relevante
                 <textarea id="inputData" rows="8" placeholder="Pega aquí solo lo necesario: función, traceback, query, criterios de aceptación..."></textarea>
               </label>
@@ -297,12 +304,12 @@
             <div class="section-title">
               <div>
                 <p class="eyebrow">Formato</p>
-                <h2>Define el formato de salida</h2>
+                <h2>Define el formato de respuesta</h2>
               </div>
               <button id="applyRecommendedOutputs" class="secondary" type="button">Aplicar recomendadas</button>
             </div>
 
-            <p class="muted max-text">Define el formato de salida esperado: estructura, ejemplos, verificación. Sé específico para evitar literatura decorativa.</p>
+            <p class="muted max-text">Define el formato de respuesta esperado: estructura, ejemplos, verificación. Sé específico para evitar literatura decorativa.</p>
 
             <div id="outputs" class="check-grid"></div>
           </section>

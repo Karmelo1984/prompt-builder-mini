@@ -1,4 +1,4 @@
-import type { PromptData } from './types/index';
+import type { PromptData, BuilderMode } from './types/index';
 import { CatalogRepository } from './domain/catalog/catalog-repository';
 import { LocalBuilderOptionsRepository } from './infrastructure/builder-options/local-builder-options-repository';
 import { buildBuilderScreenModel } from './application/builder/buildBuilderScreenModel';
@@ -6,15 +6,18 @@ import { PromptBuilder } from './services/PromptBuilder';
 import { Renderer } from './ui/renderer';
 import { bindEvents } from './handlers/index';
 
-const builder = new PromptBuilder();
-const renderer = new Renderer(builder);
+let builder: PromptBuilder;
+let renderer: Renderer;
 const bundle = CatalogRepository.getBundle();
 const catalogIndex = CatalogRepository.getIndex();
 const optionsRepository = new LocalBuilderOptionsRepository(catalogIndex);
 
 const fields = ['stack', 'role', 'project', 'objective', 'why', 'inputData', 'examples'];
 
-function goToBuilder(): void {
+function goToBuilder(mode: BuilderMode): void {
+  builder = new PromptBuilder(mode);
+  renderer = new Renderer(builder, mode);
+
   const landingView = document.getElementById('landingView');
   const builderView = document.getElementById('builderView');
   const appHeader = document.getElementById('appHeader');
@@ -25,6 +28,8 @@ function goToBuilder(): void {
   if (builderView) builderView.style.display = 'flex';
   if (appTitle) appTitle.textContent = 'AI Prompt & Workflow Builder';
   if (appLead) appLead.textContent = 'En V1 se generan prompts optimizados para GPT, Claude y Claude Code sin mezclar decisiones, contexto, restricciones ni formato de salida.';
+
+  initBuilderUI();
 }
 
 function goToLanding(): void {
@@ -40,23 +45,36 @@ function goToLanding(): void {
 }
 
 function bindNavigationEvents(): void {
-  const ctaBuilder = document.getElementById('ctaBuilder');
-  const ctaBuilderBottom = document.getElementById('ctaBuilderBottom');
+  const ctaQuickMode = document.getElementById('ctaQuickMode');
+  const ctaAdvancedMode = document.getElementById('ctaAdvancedMode');
+  const ctaQuickModeBottom = document.getElementById('ctaQuickModeBottom');
+  const ctaAdvancedModeBottom = document.getElementById('ctaAdvancedModeBottom');
   const backToLanding = document.getElementById('backToLanding');
 
-  if (ctaBuilder) ctaBuilder.addEventListener('click', goToBuilder);
-  if (ctaBuilderBottom) ctaBuilderBottom.addEventListener('click', goToBuilder);
+  if (ctaQuickMode) {
+    ctaQuickMode.addEventListener('click', () => {
+      goToBuilder('quick');
+    });
+  }
+  if (ctaAdvancedMode) {
+    ctaAdvancedMode.addEventListener('click', () => {
+      goToBuilder('advanced');
+    });
+  }
+  if (ctaQuickModeBottom) {
+    ctaQuickModeBottom.addEventListener('click', () => {
+      goToBuilder('quick');
+    });
+  }
+  if (ctaAdvancedModeBottom) {
+    ctaAdvancedModeBottom.addEventListener('click', () => {
+      goToBuilder('advanced');
+    });
+  }
   if (backToLanding) backToLanding.addEventListener('click', goToLanding);
 }
 
-function init(): void {
-  const catalogValidation = CatalogRepository.getValidation();
-  if (catalogValidation.errors.length > 0) {
-    console.error('[CatalogValidator]', catalogValidation.errors);
-  }
-
-  bindNavigationEvents();
-
+function initBuilderUI(): void {
   const screenModel = buildBuilderScreenModel(builder.getState(), catalogIndex, optionsRepository);
   const artifactKinds = bundle.artifactKinds || {};
   const providers = bundle.providers || {};
@@ -74,9 +92,19 @@ function init(): void {
   renderer.renderChecks('outputs', screenModel.catalogs.outputFormats);
   renderer.renderTips(bundle.tips);
   renderer.renderFooter();
-  bindEvents(builder, renderer, fields, updatePrompt);
+  renderer.renderSteppers(builder.getState().mode);
+  bindEvents(builder, renderer, fields, updatePrompt, builder.getState().mode);
   renderer.goToStep(1);
   updatePrompt();
+}
+
+function init(): void {
+  const catalogValidation = CatalogRepository.getValidation();
+  if (catalogValidation.errors.length > 0) {
+    console.error('[CatalogValidator]', catalogValidation.errors);
+  }
+
+  bindNavigationEvents();
 }
 
 function updatePrompt(): void {
@@ -101,6 +129,13 @@ function updatePrompt(): void {
   const question =
     templateData?.question || '¿Cuál es la respuesta correcta con el mínimo contexto necesario y cómo la verifico?';
 
+  const contextFields: Record<string, string> = {};
+  if (templateData?.requiredContextFields) {
+    templateData.requiredContextFields.forEach(fieldId => {
+      contextFields[fieldId] = renderer.getFlagValue(fieldId);
+    });
+  }
+
   const data: PromptData = {
     artifact,
     provider,
@@ -115,7 +150,8 @@ function updatePrompt(): void {
     examples,
     constraints,
     outputs,
-    question
+    question,
+    contextFields
   };
 
   const prompt = builder.buildPrompt(data, compact);

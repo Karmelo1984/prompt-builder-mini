@@ -26,6 +26,7 @@ export interface PromptTemplateItem {
   recommendedRestrictions?: string[];
   recommendedOutputs?: string[];
   question: string;
+  requiredContextFields?: string[];
 }
 
 export interface ArtifactKindItem {

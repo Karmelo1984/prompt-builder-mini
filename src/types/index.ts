@@ -2,6 +2,8 @@ import type { ProfileItem, PromptTemplateItem } from '../domain/catalog/catalog-
 
 export type { ProfileItem, PromptTemplateItem };
 
+export type BuilderMode = 'quick' | 'advanced';
+
 export interface AppState {
   currentStep: number;
   selectedArtifact: string | null;
@@ -9,6 +11,11 @@ export interface AppState {
   selectedProfile: string | null;
   selectedTemplate: string | null;
   contextTouched: boolean;
+  mode: BuilderMode;
+  reviewRequired: {
+    constraints?: boolean;
+    outputs?: boolean;
+  };
 }
 
 export interface PromptData {
@@ -26,6 +33,7 @@ export interface PromptData {
   constraints: string[];
   outputs: string[];
   question: string;
+  contextFields?: Record<string, string>;
 }
 
 export type ProfileCatalog = Record<string, ProfileItem>;

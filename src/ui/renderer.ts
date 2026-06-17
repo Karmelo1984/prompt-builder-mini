@@ -1,4 +1,5 @@
 import type { PromptBuilder } from '../services/PromptBuilder';
+import type { BuilderMode } from '../types/index';
 import { appInfo } from '../config/app-info';
 
 const $ = (id: string): HTMLElement => {
@@ -24,8 +25,11 @@ export class Renderer {
   private providers: Record<string, { id: string; label: string; description?: string }> = {};
   private artifactKinds: Record<string, { id: string; label: string; description: string }> = {};
   private templates: Record<string, { label: string; description: string; profileId: string }> = {};
+  private mode: BuilderMode;
 
-  constructor(private builder: PromptBuilder) {}
+  constructor(private builder: PromptBuilder, mode: BuilderMode = 'advanced') {
+    this.mode = mode;
+  }
 
   setCompatibility(compatibility: Record<string, string[]>): void {
     this.compatibility = compatibility;
@@ -72,6 +76,16 @@ export class Renderer {
 
   updateFlowState(): void {
     const state = this.builder.getState();
+    const stepLabels: Record<number, string> = {
+      1: 'Selecciona tipo de artefacto',
+      2: 'Selecciona proveedor',
+      3: 'Selecciona perfil',
+      4: 'Selecciona plantilla',
+      5: 'Completa información necesaria',
+      6: 'Define restricciones',
+      7: 'Define formato de respuesta'
+    };
+
     document.querySelectorAll('[data-section]').forEach(section => {
       const sectionId = Number((section as HTMLElement).dataset.section);
       const flowState = this.getFlowSectionState(sectionId);
@@ -87,14 +101,33 @@ export class Renderer {
 
       if (flowState === 'locked') {
         (section as HTMLButtonElement).disabled = true;
+        (section as HTMLButtonElement).title = `Bloqueado. Completa: ${stepLabels[sectionId - 1]}`;
       } else {
         (section as HTMLButtonElement).disabled = false;
+        (section as HTMLButtonElement).title = '';
       }
     });
   }
 
+  renderSteppers(mode: BuilderMode): void {
+    const maxStep = mode === 'quick' ? 5 : 7;
+    document.querySelectorAll('.step-pill').forEach(pill => {
+      const step = Number((pill as HTMLElement).dataset.step);
+      (pill as HTMLElement).style.display = step <= maxStep ? '' : 'none';
+    });
+    document.querySelectorAll('.step-screen').forEach(screen => {
+      const step = Number((screen as HTMLElement).dataset.screen);
+      (screen as HTMLElement).style.display = step <= maxStep ? '' : 'none';
+    });
+    const applyConstraintBtn = document.getElementById('applyRecommendedConstraints');
+    const applyOutputBtn = document.getElementById('applyRecommendedOutputs');
+    if (applyConstraintBtn) applyConstraintBtn.style.display = mode === 'quick' ? 'none' : '';
+    if (applyOutputBtn) applyOutputBtn.style.display = mode === 'quick' ? 'none' : '';
+  }
+
   canNavigateTo(step: number): boolean {
-    if (step < 1 || step > 7) return false;
+    const maxStep = this.mode === 'quick' ? 5 : 7;
+    if (step < 1 || step > maxStep) return false;
     return this.isStepAccessible(step);
   }
 
@@ -246,17 +279,19 @@ export class Renderer {
   }
 
   goToStep(step: number): void {
+    const maxStep = this.mode === 'quick' ? 5 : 7;
+    const effectiveStep = Math.min(step, maxStep);
     const state = this.builder.getState();
     document.querySelectorAll('.step-screen').forEach(screen => {
-      screen.classList.toggle('active', Number((screen as HTMLElement).dataset.screen) === step);
+      screen.classList.toggle('active', Number((screen as HTMLElement).dataset.screen) === effectiveStep);
     });
     document.querySelectorAll('.step-pill').forEach(pill => {
       const value = Number((pill as HTMLElement).dataset.step);
-      pill.classList.toggle('active', value === step);
-      pill.classList.toggle('completed', value < step && this.isStepCompleteForRender(value));
+      pill.classList.toggle('active', value === effectiveStep);
+      pill.classList.toggle('completed', value < effectiveStep && this.isStepCompleteForRender(value));
     });
-    ($('prevStep') as HTMLButtonElement).disabled = step === 1;
-    ($('nextStep') as HTMLButtonElement).disabled = step === 7;
+    ($('prevStep') as HTMLButtonElement).disabled = effectiveStep === 1;
+    ($('nextStep') as HTMLButtonElement).disabled = effectiveStep === maxStep;
     this.updateFlowState();
   }
 
@@ -277,8 +312,14 @@ export class Renderer {
   }
 
   updatePromptText(text: string): void {
-    ($('generatedPrompt') as HTMLTextAreaElement).value = text;
-    this.updateStats(text);
+    const textarea = ($('generatedPrompt') as HTMLTextAreaElement);
+    if (!text.trim()) {
+      textarea.value = 'El prompt se generará aquí cuando completes:\n\n✓ Perfil y plantilla\n✓ Información necesaria (rol, objetivo, por qué, input)\n✓ Restricciones\n✓ Formato de respuesta\n\nTodos los campos son necesarios para generar un prompt estructurado y efectivo.';
+      this.updateStats(textarea.value);
+    } else {
+      textarea.value = text;
+      this.updateStats(text);
+    }
   }
 
   private updateStats(text: string): void {
@@ -363,9 +404,9 @@ export class Renderer {
     const notice = $('resetNotice') as HTMLElement;
     const messages: Record<number, string> = {
       1: 'Pasos posteriores limpiados.',
-      2: 'Contexto, restricciones y salida limpiados.',
-      3: 'Restricciones y salida limpiadas.',
-      4: 'Salida requerida limpiada.'
+      2: 'Información, restricciones y formato limpiados.',
+      3: 'Restricciones y formato limpiados.',
+      4: 'Formato de respuesta limpiado.'
     };
     notice.textContent = messages[step] || '';
     if (this.resetNoticeTimer !== null) window.clearTimeout(this.resetNoticeTimer);
@@ -422,6 +463,78 @@ export class Renderer {
 
   isCompactMode(): boolean {
     return ($('compactMode') as HTMLInputElement).checked;
+  }
+
+  private getContextFieldLabel(fieldId: string): { label: string; placeholder: string } {
+    const labels: Record<string, { label: string; placeholder: string }> = {
+      'story-actors': {
+        label: 'Actores / roles',
+        placeholder: 'Ej.: usuario administrador, vendedor, gerente...'
+      },
+      'story-benefits': {
+        label: 'Beneficios esperados',
+        placeholder: 'Ej.: automatizar reportes diarios, ahorrar 2 horas semanales...'
+      },
+      'story-acceptance': {
+        label: 'Criterios de aceptación',
+        placeholder: 'Ej.: debe generar PDF, validar datos, enviar por email...'
+      },
+      'bug-steps': {
+        label: 'Pasos para reproducir',
+        placeholder: 'Ej.: 1. Abrir navegador\n2. Acceder a /admin\n3. Hacer click en...'
+      },
+      'bug-expected': {
+        label: 'Comportamiento esperado',
+        placeholder: 'Ej.: La página debe cargar en menos de 2 segundos...'
+      },
+      'bug-actual': {
+        label: 'Comportamiento actual',
+        placeholder: 'Ej.: La página tarda 10 segundos o muestra error 500...'
+      },
+      'bug-environment': {
+        label: 'Entorno / versiones',
+        placeholder: 'Ej.: Chrome 120, Windows 11, API v2.3.1, DB PostgreSQL 14...'
+      }
+    };
+    return labels[fieldId] || { label: fieldId, placeholder: '' };
+  }
+
+  renderContextFields(contextFieldIds: string[] | undefined): void {
+    const container = document.getElementById('contextFieldsContainer');
+    const inputDataLabel = document.getElementById('inputDataLabel');
+    if (!container) return;
+
+    if (!contextFieldIds || contextFieldIds.length === 0) {
+      container.innerHTML = '';
+      if (inputDataLabel) inputDataLabel.style.display = '';
+      return;
+    }
+
+    if (inputDataLabel) inputDataLabel.style.display = 'none';
+
+    const html = contextFieldIds
+      .map(fieldId => {
+        const { label, placeholder } = this.getContextFieldLabel(fieldId);
+        return `
+      <label class="wide">
+        ${label}
+        <textarea id="${fieldId}" rows="4" placeholder="${placeholder}"></textarea>
+      </label>
+    `;
+      })
+      .join('');
+
+    container.innerHTML = html;
+  }
+
+  markReviewRequired(containerId: string, required: boolean): void {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (required) {
+      container.classList.add('review-required');
+    } else {
+      container.classList.remove('review-required');
+    }
   }
 
   renderFooter(): void {

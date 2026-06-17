@@ -17,7 +17,12 @@
         "cases",
         "questions"
       ],
-      "question": "¿Cómo redactarías esta historia de usuario con criterios claros?"
+      "question": "¿Cómo redactarías esta historia de usuario con criterios claros?",
+      "requiredContextFields": [
+        "story-actors",
+        "story-benefits",
+        "story-acceptance"
+      ]
     },
     {
       "id": "acceptance-criteria",
@@ -140,7 +145,13 @@
         "cases",
         "risks"
       ],
-      "question": "¿Cuál es el reporte de bug claro con pasos reproducibles?"
+      "question": "¿Cuál es el reporte de bug claro con pasos reproducibles?",
+      "requiredContextFields": [
+        "bug-steps",
+        "bug-expected",
+        "bug-actual",
+        "bug-environment"
+      ]
     },
     {
       "id": "regression-checklist",

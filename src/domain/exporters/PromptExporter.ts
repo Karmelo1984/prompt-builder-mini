@@ -68,8 +68,12 @@ export class PromptExporter implements ArtifactExporter {
     if (this.isMeaningfulText(data.stack)) {
       contextLines.push(`Stack/herramientas: ${data.stack}`);
     }
+    const contextFieldLines = this.buildContextFieldsText(data.contextFields);
+    if (contextFieldLines.length > 0) {
+      contextLines.push(...contextFieldLines);
+    }
     if (this.isMeaningfulText(data.inputData)) {
-      contextLines.push(`Información relevante:\n${data.inputData}`);
+      contextLines.push(`Información adicional:\n${data.inputData}`);
     }
     if (contextLines.length > 0) {
       blocks.push(`<contexto>\n${contextLines.join('\n')}\n</contexto>`);
@@ -124,8 +128,13 @@ export class PromptExporter implements ArtifactExporter {
       parts.push(`Proyecto: ${data.project}.`);
     }
 
+    const contextFieldLines = this.buildContextFieldsText(data.contextFields);
+    if (contextFieldLines.length > 0) {
+      parts.push(`Contexto: ${contextFieldLines.join('; ')}.`);
+    }
+
     if (this.isMeaningfulText(data.inputData)) {
-      parts.push(`Input: ${data.inputData}.`);
+      parts.push(`Información adicional: ${data.inputData}.`);
     }
 
     if (data.constraints.length > 0) {
@@ -145,6 +154,31 @@ export class PromptExporter implements ArtifactExporter {
     }
 
     return parts.filter(p => p).join('\n');
+  }
+
+  private getContextFieldLabel(fieldId: string): string {
+    const labels: Record<string, string> = {
+      'story-actors': 'Actores / roles',
+      'story-benefits': 'Beneficios esperados',
+      'story-acceptance': 'Criterios de aceptación',
+      'bug-steps': 'Pasos para reproducir',
+      'bug-expected': 'Comportamiento esperado',
+      'bug-actual': 'Comportamiento actual',
+      'bug-environment': 'Entorno / versiones'
+    };
+    return labels[fieldId] || fieldId;
+  }
+
+  private buildContextFieldsText(contextFields: Record<string, string> | undefined): string[] {
+    const lines: string[] = [];
+    if (!contextFields) return lines;
+    Object.entries(contextFields).forEach(([fieldId, value]) => {
+      if (this.isMeaningfulText(value)) {
+        const label = this.getContextFieldLabel(fieldId);
+        lines.push(`${label}: ${value}`);
+      }
+    });
+    return lines;
   }
 
   private isMeaningfulText(value: string | undefined | null): boolean {

@@ -21,6 +21,7 @@ interface JsonTemplate {
   recommendedRestrictions?: string[];
   recommendedOutputs?: string[];
   question: string;
+  requiredContextFields?: string[];
 }
 
 interface JsonConstraint {
@@ -61,7 +62,8 @@ export class JsonCatalogRepository {
         objective: template.objective,
         recommendedRestrictions: template.recommendedRestrictions,
         recommendedOutputs: template.recommendedOutputs,
-        question: template.question
+        question: template.question,
+        requiredContextFields: template.requiredContextFields
       };
     });
 

@@ -1,5 +1,6 @@
 import type { PromptBuilder } from '../services/PromptBuilder';
 import type { Renderer } from '../ui/renderer';
+import type { BuilderMode } from '../types/index';
 
 const $ = (id: string): HTMLElement => document.getElementById(id)!;
 
@@ -11,29 +12,33 @@ function resetCascade(
   renderer: Renderer,
   fields: string[]
 ): void {
+  const state = builder.getState();
+
   if (scope === 'profile') {
-    renderer.clearFlagValues(fields);
-    renderer.clearChecks('constraints');
-    renderer.clearChecks('outputs');
+    state.reviewRequired.constraints = true;
+    state.reviewRequired.outputs = true;
+    renderer.markReviewRequired('constraints', true);
+    renderer.markReviewRequired('outputs', true);
     renderer.updateTemplateBadge();
     renderer.showResetNotice(1);
   } else if (scope === 'template') {
-    builder.resetContext();
-    renderer.clearFlagValues(fields);
-    renderer.clearChecks('constraints');
-    renderer.clearChecks('outputs');
+    state.reviewRequired.constraints = true;
+    state.reviewRequired.outputs = true;
+    renderer.markReviewRequired('constraints', true);
+    renderer.markReviewRequired('outputs', true);
     renderer.showResetNotice(2);
   } else if (scope === 'context') {
-    renderer.clearChecks('constraints');
-    renderer.clearChecks('outputs');
+    state.reviewRequired.outputs = true;
+    renderer.markReviewRequired('outputs', true);
     renderer.showResetNotice(3);
   } else {
-    renderer.clearChecks('outputs');
+    state.reviewRequired.outputs = true;
+    renderer.markReviewRequired('outputs', true);
     renderer.showResetNotice(4);
   }
 }
 
-export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: string[], updatePrompt: () => void): void {
+export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: string[], updatePrompt: () => void, mode: BuilderMode): void {
   // Artefacto y proveedor
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement;
@@ -100,6 +105,7 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
         renderer.setFlagValue('objective', templateData.objective);
         renderer.setChecked('constraints', templateData.recommendedRestrictions ?? []);
         renderer.setChecked('outputs', templateData.recommendedOutputs ?? []);
+        renderer.renderContextFields(templateData.requiredContextFields);
       }
       renderer.updateTemplateBadge();
       renderer.markRecommended();
@@ -207,7 +213,19 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
   });
 
   ($('nextStep') as HTMLElement).addEventListener('click', () => {
-    const nextStep = builder.getState().currentStep + 1;
+    const currentStep = builder.getState().currentStep;
+    if (mode === 'quick' && currentStep === 5) {
+      const templateData = builder.getPromptTemplateData();
+      if (templateData) {
+        renderer.clearChecks('constraints');
+        renderer.setChecked('constraints', templateData.recommendedRestrictions ?? []);
+        renderer.clearChecks('outputs');
+        renderer.setChecked('outputs', templateData.recommendedOutputs ?? []);
+        updatePrompt();
+      }
+      return;
+    }
+    const nextStep = currentStep + 1;
     if (renderer.canNavigateTo(nextStep)) {
       builder.nextStep();
       renderer.goToStep(builder.getState().currentStep);
@@ -248,6 +266,8 @@ export function bindEvents(builder: PromptBuilder, renderer: Renderer, fields: s
     ($('compactMode') as HTMLInputElement).checked = false;
     renderer.clearChecks('constraints');
     renderer.clearChecks('outputs');
+    renderer.markReviewRequired('constraints', false);
+    renderer.markReviewRequired('outputs', false);
     renderer.updateArtifactBadge();
     renderer.updateProviderBadge();
     renderer.updateProfileBadge();
